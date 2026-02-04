@@ -1,0 +1,24 @@
+[Desktop Entry]
+Categories=System;TerminalEmulator;
+Comment[en_IE]=Fast, feature-rich, GPU based terminal
+Comment=Fast, feature-rich, GPU based terminal
+Exec=kitty --single-instance --app-id kitty-dropdown --start-as minimized --hold --config '~/.config/kitty/kitty-dropdown.conf'
+GenericName[en_IE]=Terminal emulator
+GenericName=Terminal emulator
+Icon=kitty
+MimeType=
+Name[en_IE]=Kitty
+Name=Kitty
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+TryExec=kitty
+Type=Application
+Version=1.0
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+X-TerminalArgAppId=--class
+X-TerminalArgDir=--working-directory
+X-TerminalArgExec=--
+X-TerminalArgHold=--hold
+X-TerminalArgTitle=--title
