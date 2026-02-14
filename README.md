@@ -82,22 +82,25 @@ The positioning depends on your specific monitor resolution and KDE scaling. **U
 
 ## 4. Smart EOF (Ctrl+D) Handling
 
-To prevent the drop-down from closing when the last shell panel receives an EOF (`Ctrl+D`), source the provided `kitty-dropdown.sh` in your shell configuration.
+To prevent the drop-down window from closing when the last tab receives an EOF (`Ctrl+D`), this project provides a Python kitten that manages window state natively.
 
+### Installation
+1. Move `dropdown_manager.py` to your kitty configuration directory:
 ```bash
-if [[ "$TERM" == "xterm-kitty" ]]; then
-    PARENT_NAME=$(ps -p $PPID -o comm= 2>/dev/null | tr -d ' ')
-    if [[ "$PARENT_NAME" == "kitten" ]]; then
-        export IGNOREEOF=1
-        bind '"\C-d": "\C-u \C-k clear\n"'
-        alias qexit='unset IGNOREEOF && exit'
-    else
-        export IGNOREEOF=0
-    fi
-fi
+cp dropdown_manager.py ~/.config/kitty/
 ```
 
-This script detects if the Bash instance is the primary shell (launched by Kitty's main process) or a secondary panel. If it is the primary shell, `Ctrl+D` will simply clear the screen instead of exiting.
+2. Add the following mapping to your `kitty-dropdown.conf`:
+```conf
+map ctrl+d kitten dropdown_manager.py
+```
+
+### How it Works
+
+Unlike standard shell bindings, this script is process-aware:
+
+* **Local Shell:** If you are at a local prompt, `Ctrl+D` will **minimize** the window if it's the last tab, or **close** the tab if others are open.
+* **SSH & Apps:** If you are running `ssh`, `python`, `vim`, or other interactive tools, it sends a standard EOF signal, allowing the program to exit normally without minimizing your terminal.
 
 ---
 
