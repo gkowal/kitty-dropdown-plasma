@@ -1,6 +1,6 @@
 {
 	"KPlugin": {
-		"Id": "kitty-dropdown-plasma",
+		"Id": "org.kde.kitty-dropdown-plasma",
 		"Name": "Kitty Drop-Down Plasma",
 		"Version": "1.1",
 		"Description": "A Quake-style drop-down terminal script for Kitty on KDE Plasma 6.",
