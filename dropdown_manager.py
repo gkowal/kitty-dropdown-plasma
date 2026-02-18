@@ -1,4 +1,5 @@
 import subprocess
+import shutil
 from kittens.tui.handler import result_handler
 
 def main(args):
@@ -39,13 +40,15 @@ def handle_result(args, result, target_window_id, boss):
     # 4. Handle the logic purely at the Tab level
     if tab_count == 1:
         # Last tab: Minimize the window natively via KDE Plasma D-Bus
-        subprocess.run([
-            "qdbus6", 
-            "org.kde.kglobalaccel", 
-            "/component/kwin", 
-            "org.kde.kglobalaccel.Component.invokeShortcut", 
-            "Window Minimize"
-        ], check=False)
+        qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6")
+        if qdbus_cmd:
+            subprocess.run([
+                qdbus_cmd,
+                "org.kde.kglobalaccel",
+                "/component/kwin",
+                "org.kde.kglobalaccel.Component.invokeShortcut",
+                "Window Minimize"
+            ], check=False)
     else:
         # Multiple tabs: Close the active tab entirely
         try:
