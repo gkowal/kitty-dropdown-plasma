@@ -2,6 +2,8 @@
 
 **Kitty Drop-Down Plasma** is a productivity-focused KWin script designed for **KDE Plasma 6**. It provides a Quake-style, drop-down terminal experience using the high-performance **Kitty** terminal emulator. This project combines KWin window management logic with shell-level integration to ensure your terminal is always available and protected from accidental closure.
 
+[![kde-store](https://img.shields.io/badge/KDE%20Store-download-blue?logo=KDE)](https://store.kde.org/p/2348115)
+
 ---
 
 ## 1. Installation Guide
