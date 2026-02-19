@@ -1,8 +1,11 @@
 # Kitty Drop-Down Plasma
 
-**Kitty Drop-Down Plasma** is a productivity-focused KWin script designed for **KDE Plasma 6**. It provides a Quake-style, drop-down terminal experience using the high-performance **Kitty** terminal emulator. This project combines KWin window management logic with shell-level integration to ensure your terminal is always available and protected from accidental closure.
+**Kitty Drop-Down Plasma** is a productivity-focused KWin script designed for **KDE Plasma 6**. It provides a Quake-style, drop-down terminal experience using [**Kitty**](https://sw.kovidgoyal.net/kitty/), a fast, feature-rich, GPU-based terminal emulator. You can explore the source code or contribute to its development on the [Kitty GitHub repository](https://github.com/kovidgoyal/kitty).
+
+This project combines KWin window management logic with shell-level integration to ensure your terminal is always available and protected from accidental closure.
 
 [![kde-store](https://img.shields.io/badge/KDE%20Store-download-blue?logo=KDE)](https://store.kde.org/p/2348115)
+[![Kitty Terminal](https://img.shields.io/badge/Terminal-Kitty-green?logo=kitty&logoColor=white)](https://sw.kovidgoyal.net/kitty/)
 
 ---
 
@@ -57,6 +60,8 @@ cp kitty-autostart.desktop ~/.config/autostart/
 ```
 
 The `--app-id kitty-dropdown` flag in this file is critical for the KWin script to identify the window.
+
+**Note on Terminal Choice:** This project is built specifically for **Kitty** because it supports native **[Kittens (Python scripts)](https://sw.kovidgoyal.net/kitty/kittens/custom/)**. This allows us to handle complex window behaviors—like the "Smart EOF" logic—directly within the terminal's internal API, which is not possible with standard emulators.
 
 ---
 
