@@ -85,6 +85,26 @@ This launches Kitty minimized at desktop login so it is ready when you press the
 
 **Note on Terminal Choice:** This project is built specifically for **Kitty** because it supports native **[Kittens (Python scripts)](https://sw.kovidgoyal.net/kitty/kittens/custom/)**. This allows us to handle complex window behaviors—like the "Smart EOF" logic—directly within the terminal's internal API, which is not possible with standard emulators.
 
+### System Tray Integration (Optional)
+
+An optional system tray icon application (`kitty_tray.py`) is provided for users who prefer toggling the terminal via a tray icon in their KDE Plasma Panel.
+
+#### Prerequisites
+`kitty_tray.py` requires **Python 3** and **PyQt6**:
+- **Fedora / RHEL**: `sudo dnf install python3-pyqt6`
+- **Arch Linux / Manjaro**: `sudo pacman -S python-pyqt6`
+- **Ubuntu / Debian**: `sudo apt install python3-pyqt6`
+- **openSUSE**: `sudo zypper install python3-PyQt6`
+
+#### Enabling the System Tray Icon
+To have the system tray icon start automatically upon desktop login, copy the provided autostart desktop entry:
+
+```bash
+cp ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty-tray-autostart.desktop ~/.config/autostart/
+```
+
+Left-clicking the tray icon toggles the drop-down terminal (and auto-launches Kitty if not currently running). Right-clicking opens a context menu with options to toggle or exit the tray application.
+
 ---
 
 ## 3. KDE Window Rules
