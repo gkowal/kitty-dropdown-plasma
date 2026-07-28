@@ -51,15 +51,37 @@ Once installed, the script must be activated within your system settings.
 
 While not strictly required, using a dedicated configuration file allows you to style the drop-down terminal independently of your main Kitty windows. Create a file at `~/.config/kitty/kitty-dropdown.conf` with your preferred settings (e.g., transparency or specific fonts).
 
-### Autostart Setup
+### Launch Methods: Systemd Service vs. Autostart File
 
-To have the terminal ready upon login, move the provided `kitty-autostart.desktop` file to your autostart directory:
+You can choose between two methods to manage the Kitty process:
+
+#### Method A: On-Demand Systemd Service (Recommended)
+
+If your Linux distribution uses `systemd` user sessions (Fedora, Arch, Manjaro, openSUSE, Ubuntu, Debian, etc.), we strongly recommend using the provided systemd service:
+
+```bash
+mkdir -p ~/.config/systemd/user/
+cp kitty-dropdown.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+```
+
+**Why this is preferred:**
+- **Zero Resource Overhead at Boot:** Kitty is **not** launched at desktop startup, consuming 0 RAM and CPU.
+- **On-Demand Activation:** The first time you press the toggle shortcut (`Meta+F12`), the KWin script automatically starts the service via D-Bus.
+- **Self-Healing:** If Kitty crashes or is closed, pressing the shortcut automatically re-launches it on demand.
+
+#### Method B: Traditional Autostart File (Non-Systemd Environments)
+
+If your system does not use `systemd` user sessions (e.g., Devuan, Gentoo/OpenRC, Void, Artix), you can launch Kitty automatically on desktop login using the provided `.desktop` file:
 
 ```bash
 cp kitty-autostart.desktop ~/.config/autostart/
 ```
 
-The `--app-id kitty-dropdown` flag in this file is critical for the KWin script to identify the window.
+This launches Kitty minimized at desktop login so it is ready when you press the shortcut.
+
+> [!NOTE]
+> For non-systemd environments where Kitty was not autostarted on login, the script will attempt a fallback launch using KRunner when the shortcut is pressed. Please note that this fallback method has not been tested by the author.
 
 **Note on Terminal Choice:** This project is built specifically for **Kitty** because it supports native **[Kittens (Python scripts)](https://sw.kovidgoyal.net/kitty/kittens/custom/)**. This allows us to handle complex window behaviors—like the "Smart EOF" logic—directly within the terminal's internal API, which is not possible with standard emulators.
 

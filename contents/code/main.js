@@ -64,6 +64,30 @@ function hide(client) {
 	client.minimized = true;
 }
 
+function launchKitty() {
+	print("Kitty dropdown not found. Launching kitty via DBus...");
+	callDBus(
+		"org.freedesktop.systemd1",
+		"/org/freedesktop/systemd1",
+		"org.freedesktop.systemd1.Manager",
+		"StartUnit",
+		"kitty-dropdown.service",
+		"replace",
+		function(res) {
+			if (!res) {
+				print("Systemd user manager unavailable. Falling back to KRunner launch...");
+				callDBus(
+					"org.kde.krunner",
+					"/App",
+					"org.kde.krunner.App",
+					"query",
+					"kitty --single-instance --class kitty-dropdown --app-id kitty-dropdown --hold --config ~/.config/kitty/kitty-dropdown.conf"
+				);
+			}
+		}
+	);
+}
+
 function toggleKitty() {
 	let kitty = findKitty();
 	if ( kitty ) {
@@ -78,7 +102,7 @@ function toggleKitty() {
 			activate(kitty);
 		}
 	} else {
-		print("Kitty dropdown not found. Ensure you launched kitty with: kitty --class kitty-dropdown");
+		launchKitty();
 	}
 }
 

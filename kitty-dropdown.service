@@ -1,0 +1,7 @@
+[Unit]
+Description=Kitty Drop-Down Terminal Service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env kitty --single-instance --class kitty-dropdown --app-id kitty-dropdown --hold --config %h/.config/kitty/kitty-dropdown.conf
+Restart=no
