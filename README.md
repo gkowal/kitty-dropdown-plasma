@@ -130,6 +130,15 @@ If you prefer fixed pixel dimensions or custom placement over the script's defau
 > [!NOTE]
 > Setting **Position** and **Size** to **Force** is required if you want KWin to override the script's default dynamic geometry.
 
+### Customizing Toggle Animations & Desktop Effects
+
+The show/hide animation of the drop-down window is managed natively by KDE Plasma's C++ GPU Desktop Effects:
+
+- **Default Behavior**: Plasma 6 applies its default minimize effect (**Squish** / **Scale**), which smoothly scales the terminal window in and out.
+- **Top-Down Sliding**: To get a Quake/Yakuake-style top-down slide animation, ensure **System Settings > Desktop Effects > Slide** is enabled. You can also create a Window Rule for `kitty-dropdown` adding property **Minimize animation** -> **Force** -> **Slide**.
+- **Instant Toggling (No Animation)**: If you prefer instant toggling without any shrink/scale effect, create a Window Rule for `kitty-dropdown` adding property **Minimize animation** -> **Force** -> **None**.
+- **Animation Speed**: Global animation duration can be adjusted in **System Settings > Display & Monitor > Animation Speed**.
+
 ---
 
 ## 4. Smart EOF (Ctrl+D) Handling
