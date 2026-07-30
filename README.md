@@ -107,25 +107,28 @@ Left-clicking the tray icon toggles the drop-down terminal (and auto-launches Ki
 
 ---
 
-## 3. KDE Window Rules
+## 3. Window Positioning & Custom Overrides
 
-To ensure the terminal appears borderless and correctly positioned, you must create a Window Rule in **System Settings > Window Management > Window Rules**.
+By default, **no manual KDE Window Rules are required**. The KWin script natively strips window borders and dynamically calculates optimal positioning (**72% screen width**, **78% screen height**, 1px top offset) on any active display, automatically adjusting for multi-monitor setups, high-DPI scaling, and top Plasma panel offsets.
 
-* **Target Window Class:** `kitty kitty-dropdown` 
-* **Window Types:** Normal Window 
-* **No titlebar and frame:** Force -> Yes 
+### Forcing Custom Window Rules (Optional)
 
+If you prefer fixed pixel dimensions or custom placement over the script's default 72%/78% dynamic ratios:
 
-### Scaling & Dimensions
+#### Method A: Quick Auto-Capture via Window Menu (Recommended)
+1. Press `Meta+F12` to open the Kitty drop-down terminal.
+2. Press `Alt+F3` -> **More Actions** -> **Configure Special Window Settings...**.
+3. Click **Add Property...** and add **Position** and **Size**.
+4. Set both properties to **Force** (or **Force Temporarily**) and enter your preferred pixel coordinates.
+5. Click **Apply** and **OK**.
 
-The positioning depends on your specific monitor resolution and KDE scaling. **Users are highly encouraged to experiment with these values** to find the perfect fit for their specific display environment, especially when using fractional scaling on Wayland. 
+#### Method B: Manual System Settings Rule
+1. Navigate to **System Settings > Window Management > Window Rules**.
+2. Create a new rule targeting **Window Class (exact match)**: `kitty-dropdown`.
+3. Add properties **Position** and **Size**, set both to **Force**, and specify your values.
 
-| Resolution | Scaling | Recommended Position | Recommended Size |
-| --- | --- | --- | --- |
-| **3840x2160** | **150%** | `280,1` | `2000,1030` |
-| **1920x1080** | **125%** | `125,1` | `1286,705` |
-
-**IMPORTANT**: Both **Position** and **Size** properties must be set to **Force** in the Window Rule settings to prevent the terminal from being automatically resized or moved by KWin.
+> [!NOTE]
+> Setting **Position** and **Size** to **Force** is required if you want KWin to override the script's default dynamic geometry.
 
 ---
 

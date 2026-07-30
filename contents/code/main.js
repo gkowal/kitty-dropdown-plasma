@@ -28,6 +28,7 @@ function activate(client) {
 
 function setupClient(client) {
 	print("setupClient: Targeting kitty-dropdown");
+	client.noBorder = true;
 	client.onAllDesktops = true;
 	client.skipTaskbar = true;
 	client.skipSwitcher = true;
@@ -35,6 +36,9 @@ function setupClient(client) {
 	client.keepAbove = true;
 	client.fullScreen = false;
 	client.setMaximize(false, false);
+	let geom = getTargetGeometry(client);
+	client.frameGeometry = geom;
+	client.geometry = geom;
 }
 
 function printClient(client) {
@@ -50,14 +54,50 @@ function printClient(client) {
 		"");
 }
 
-function show(client) {
-	client.geometry = {
-	  x: 290,
-	  y: 1,
-	  width: 2002,
-	  height: 1029
+function getTargetGeometry(client) {
+	let screen = workspace.activeScreen;
+	let area = null;
+	if (screen) {
+		try {
+			// In KWin 6 API, 2 = MaximizeArea (accounts for top/bottom Plasma panels)
+			area = workspace.clientArea(2, screen, workspace.currentDesktop);
+		} catch (e) {
+			try {
+				// 0 = PlacementArea
+				area = workspace.clientArea(0, screen, workspace.currentDesktop);
+			} catch (e2) {
+				area = screen.geometry;
+			}
+		}
+	}
+	if (!area && screen && screen.geometry) {
+		area = screen.geometry;
+	}
+	if (area) {
+		let width = Math.round(area.width * 0.72);
+		let height = Math.round(area.height * 0.78);
+		let x = area.x + Math.round((area.width - width) / 2);
+		let y = area.y + 1;
+		return {
+			x: x,
+			y: y,
+			width: width,
+			height: height
+		};
+	}
+	return {
+		x: 269,
+		y: 1,
+		width: 1382,
+		height: 842
 	};
+}
+
+function show(client) {
 	client.minimized = false;
+	let geom = getTargetGeometry(client);
+	client.frameGeometry = geom;
+	client.geometry = geom;
 }
 
 function hide(client) {
