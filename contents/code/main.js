@@ -26,6 +26,13 @@ function activate(client) {
 	workspace.activeWindow = client;
 }
 
+function hasCustomWindowRule(client) {
+	if (!client.frameGeometry) return false;
+	let fg = client.frameGeometry;
+	// If Y is positioned near top of screen (<= 10) or dimensions were set by window rule, respect KWin rule
+	return (fg.y <= 10) || (fg.width >= 1200) || (fg.height >= 800);
+}
+
 function setupClient(client) {
 	print("setupClient: Targeting kitty-dropdown");
 	client.noBorder = true;
@@ -36,9 +43,13 @@ function setupClient(client) {
 	client.keepAbove = true;
 	client.fullScreen = false;
 	client.setMaximize(false, false);
-	let geom = getTargetGeometry(client);
-	client.frameGeometry = geom;
-	client.geometry = geom;
+
+	// Only apply default script geometry if KWin Window Rules have not already set custom geometry
+	if (!hasCustomWindowRule(client)) {
+		let geom = getTargetGeometry(client);
+		client.frameGeometry = geom;
+		client.geometry = geom;
+	}
 }
 
 function printClient(client) {
@@ -95,9 +106,12 @@ function getTargetGeometry(client) {
 
 function show(client) {
 	client.minimized = false;
-	let geom = getTargetGeometry(client);
-	client.frameGeometry = geom;
-	client.geometry = geom;
+	// Only re-apply target geometry if the window moved to a different monitor
+	if (client.screen && workspace.activeScreen && client.screen !== workspace.activeScreen) {
+		let geom = getTargetGeometry(client);
+		client.frameGeometry = geom;
+		client.geometry = geom;
+	}
 }
 
 function hide(client) {
