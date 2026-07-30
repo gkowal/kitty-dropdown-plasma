@@ -3,10 +3,10 @@
 */
 
 function isKitty(client) {
-	return client &&
-		   !client.deleted &&
-		   client.normalWindow &&
-		   client.resourceClass.toString() === "kitty-dropdown";
+	if (!client || client.deleted || !client.normalWindow) return false;
+	let rClass = client.resourceClass ? client.resourceClass.toString() : "";
+	let rName = client.resourceName ? client.resourceName.toString() : "";
+	return rClass === "kitty-dropdown" || rName === "kitty-dropdown";
 }
 
 function findKitty() {
@@ -29,8 +29,8 @@ function activate(client) {
 function hasCustomWindowRule(client) {
 	if (!client.frameGeometry) return false;
 	let fg = client.frameGeometry;
-	// If Y is positioned near top of screen (<= 10) or dimensions were set by window rule, respect KWin rule
-	return (fg.y <= 10) || (fg.width >= 1200) || (fg.height >= 800);
+	// A window positioned near top edge (y <= 25) indicates KWin Window Rule placement
+	return (fg.y <= 25);
 }
 
 function setupClient(client) {

@@ -11,15 +11,16 @@ def handle_result(args, result, target_window_id, boss):
     if not window:
         return
 
-    # 1. Detect foreground process (SSH, Python, etc.)
-    # If the active process is not the local shell, send a standard Ctrl+D (\x04)
+    # 1. Detect foreground process (SSH, Python, Vim, etc.)
+    # If active process is not a local shell, send a standard Ctrl+D (\x04)
+    KNOWN_SHELLS = ('bash', 'zsh', 'fish', 'sh', 'nu', 'dash', 'tcsh', 'csh', 'ksh', 'elvish')
     try:
         fg_processes = getattr(window.child, 'foreground_processes', [])
         for p in fg_processes:
             cmd = p.get('cmdline', [])
             if cmd:
                 exe = cmd[0].split('/')[-1]
-                if exe not in ('bash', 'zsh', 'fish', 'sh'):
+                if exe not in KNOWN_SHELLS:
                     window.write_to_child("\x04")
                     return
     except Exception:
@@ -40,7 +41,7 @@ def handle_result(args, result, target_window_id, boss):
     # 4. Handle the logic purely at the Tab level
     if tab_count == 1:
         # Last tab: Minimize the window natively via KDE Plasma D-Bus
-        qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6")
+        qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6") or shutil.which("qdbus")
         if qdbus_cmd:
             subprocess.run([
                 qdbus_cmd,
@@ -49,6 +50,11 @@ def handle_result(args, result, target_window_id, boss):
                 "org.kde.kglobalaccel.Component.invokeShortcut",
                 "Window Minimize"
             ], check=False)
+        else:
+            try:
+                boss.close_os_window()
+            except AttributeError:
+                pass
     else:
         # Multiple tabs: Close the active tab entirely
         try:
