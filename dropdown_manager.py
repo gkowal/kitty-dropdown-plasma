@@ -7,13 +7,13 @@ def main(args):
 
 @result_handler(no_ui=True)
 def handle_result(args, result, target_window_id, boss):
-    window = boss.active_window
+    window = boss.window_id_map.get(target_window_id) or boss.active_window
     if not window:
         return
 
     # 1. Detect foreground process (SSH, Python, Vim, etc.)
     # If active process is not a local shell, send a standard Ctrl+D (\x04)
-    KNOWN_SHELLS = ('bash', 'zsh', 'fish', 'sh', 'nu', 'dash', 'tcsh', 'csh', 'ksh', 'elvish')
+    KNOWN_SHELLS = ('bash', 'zsh', 'fish', 'sh', 'nu', 'dash', 'tcsh', 'csh', 'ksh', 'elvish', 'pwsh', 'powershell', 'xonsh', 'oil', 'ion')
     try:
         fg_processes = getattr(window.child, 'foreground_processes', [])
         for p in fg_processes:
@@ -27,7 +27,7 @@ def handle_result(args, result, target_window_id, boss):
         pass
 
     # 2. Get the current active tab and OS window
-    tab = boss.active_tab
+    tab = getattr(window, 'tab', None) or boss.active_tab
     if not tab:
         return
 
