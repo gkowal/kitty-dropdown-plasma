@@ -134,8 +134,8 @@ If you prefer fixed pixel dimensions or custom placement over the script's defau
 
 Show/hide transitions for drop-down windows are managed natively by KDE Plasma's C++ GPU Desktop Effects engine:
 
-- **Desktop Effects**: Open/close animations (such as **Slide**, **Squish**, or **Scale**) can be configured globally in **System Settings > Desktop Effects**.
-- **Animation Speed**: Global animation duration can be adjusted under **System Settings > Display & Monitor > Animation Speed** (or **System Settings > Desktop Effects**).
+- **Desktop Effects**: Window state animations (such as **Slide**, **Squish**, or **Scale**) can be configured in **System Settings > Animations** (or **System Settings > Desktop Effects** in earlier Plasma versions).
+- **Animation Speed**: Global animation speed can be adjusted via the speed slider in **System Settings > Animations** (or **System Settings > Desktop Effects**).
 
 ---
 
