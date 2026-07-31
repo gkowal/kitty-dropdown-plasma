@@ -107,28 +107,84 @@ Left-clicking the tray icon toggles the drop-down terminal (and auto-launches Ki
 
 ---
 
-## 3. Window Positioning & Custom Overrides
+## 3. Window Positioning & Configuration
 
 By default, **no manual KDE Window Rules are required**. The KWin script natively strips window borders and dynamically calculates optimal positioning (**72% screen width**, **78% screen height**, 1px top offset) on any active display, automatically adjusting for multi-monitor setups, high-DPI scaling, and top Plasma panel offsets.
 
-### Forcing Custom Window Rules (Optional)
+### Graphical Configuration System (Plasma 6)
 
-If you prefer fixed pixel dimensions or custom placement over the script's default 72%/78% dynamic ratios:
+The script includes a native KDE configuration interface accessible directly in system settings:
 
-#### Method A: Quick Auto-Capture via Window Menu (Recommended)
-1. Press `Meta+F12` to open the Kitty drop-down terminal.
-2. Press `Alt+F3` -> **More Actions** -> **Configure Special Window Settings...**.
-3. Click **Add Property...** and add **Position** and **Size**.
-4. Set both properties to **Force** (or **Force Temporarily**) and enter your preferred pixel coordinates.
-5. Click **Apply** and **OK**.
-
-#### Method B: Manual System Settings Rule
-1. Navigate to **System Settings > Window Management > Window Rules**.
-2. Create a new rule targeting **Window Class (exact match)**: `kitty-dropdown`.
-3. Add properties **Position** and **Size**, set both to **Force**, and specify your values.
+1. Open **System Settings > Window Management > KWin Scripts**.
+2. Locate **Kitty Drop-Down Plasma**.
+3. Click the **Configure (Gear Icon)** button next to it.
+4. Adjust your preferred ratios or per-screen settings, then click **Apply**.
 
 > [!NOTE]
-> Setting **Position** and **Size** to **Force** is required if you want KWin to override the script's default dynamic geometry.
+> **Wayland Initial Pointer Tracking:** Right after logging in to KDE Plasma Wayland—before moving your physical mouse—KWin reports the active screen based on initial Plasma session startup focus. Moving your mouse pointer even 1 pixel updates KWin's active screen tracker to the display containing your cursor for all subsequent toggles.
+
+---
+
+### Configuration Options & Defaults
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **`widthRatio`** | Double | `0.72` | Screen width percentage ($0.10 \dots 1.00$, where `0.72` = 72% of screen width). |
+| **`heightRatio`** | Double | `0.78` | Screen height percentage ($0.10 \dots 1.00$, where `0.78` = 78% of screen height). |
+| **`yOffset`** | Integer | `1` | Top-edge offset in pixels from the top of the monitor. |
+| **`customWidth`** | Integer | `0` | Explicit width in pixels (`0` = use `widthRatio`). |
+| **`customHeight`** | Integer | `0` | Explicit height in pixels (`0` = use `heightRatio`). |
+| **`screenOverrides`** | String (JSON) | `""` | Per-monitor JSON overrides keyed by output name. |
+
+---
+
+### Finding Monitor Output Names (`kscreen-doctor`)
+
+To find the exact output names of your connected displays (e.g. `eDP-1`, `HDMI-A-1`, `DP-1`), run:
+
+```bash
+kscreen-doctor -o
+```
+
+Look for lines starting with `Output: 1 eDP-1` or `Output: 2 HDMI-A-1`.
+
+---
+
+### Per-Screen Overrides (`screenOverrides`)
+
+The `screenOverrides` setting accepts a JSON object mapping monitor names to custom settings:
+
+* **Explicit Pixels on Laptop Screen (`eDP-1`):**
+  ```json
+  {"eDP-1": {"width": 1286, "height": 705}}
+  ```
+* **Different Ratios for Laptop (`eDP-1`) and External Monitor (`HDMI-A-1`):**
+  ```json
+  {"eDP-1": {"widthRatio": 0.80, "heightRatio": 0.70}, "HDMI-A-1": {"widthRatio": 0.72, "heightRatio": 0.78}}
+  ```
+* **Mixing Explicit Pixels and Dynamic Ratios:**
+  ```json
+  {"eDP-1": {"width": 1286, "height": 705}, "HDMI-A-1": {"widthRatio": 0.75, "heightRatio": 0.80, "yOffset": 2}}
+  ```
+
+---
+
+### Command-Line Configuration (`~/.config/kwinrc`)
+
+For dotfile managers or command-line configuration, settings can be set via `kwriteconfig6`:
+
+```bash
+# Set a custom global width ratio
+kwriteconfig6 --file kwinrc --group Script-org.kde.kitty-dropdown-plasma --key widthRatio 0.80
+
+# Set per-monitor JSON overrides
+kwriteconfig6 --file kwinrc --group Script-org.kde.kitty-dropdown-plasma --key screenOverrides '{"eDP-1": {"width": 1286, "height": 705}}'
+
+# Apply changes instantly
+qdbus6 org.kde.KWin /KWin reconfigure
+```
+
+---
 
 ### Customizing Toggle Animations & Desktop Effects
 

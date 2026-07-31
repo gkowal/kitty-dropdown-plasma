@@ -12,9 +12,14 @@
 		],
 		"Category": "Script",
 		"License": "MIT",
-		"Website": "https://github.com/gkowal/kitty-dropdown-plasma"
+		"Website": "https://github.com/gkowal/kitty-dropdown-plasma",
+		"KPackageStructure": "KWin/Script"
 	},
 	"X-Plasma-API": "javascript",
 	"X-Plasma-MainScript": "code/main.js",
+	"X-KDE-ConfigXml": "main.xml",
+	"X-KDE-PluginInfo-ConfigXml": "main.xml",
+	"X-KDE-ConfigModule": "kwin/effects/configs/kcm_kwin4_genericscripted",
+	"X-KDE-PluginKeyword-Script": "org.kde.kitty-dropdown-plasma",
 	"KPackageStructure": "KWin/Script"
 }

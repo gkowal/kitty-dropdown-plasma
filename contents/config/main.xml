@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+  <group name="">
+    <entry name="widthRatio" type="Double">
+      <default>0.72</default>
+    </entry>
+    <entry name="heightRatio" type="Double">
+      <default>0.78</default>
+    </entry>
+    <entry name="yOffset" type="Int">
+      <default>1</default>
+    </entry>
+    <entry name="customWidth" type="Int">
+      <default>0</default>
+    </entry>
+    <entry name="customHeight" type="Int">
+      <default>0</default>
+    </entry>
+    <entry name="screenOverrides" type="String">
+      <default></default>
+    </entry>
+  </group>
+</kcfg>

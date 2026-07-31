@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KittyDropdownConfig</class>
+ <widget class="QWidget" name="KittyDropdownConfig">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelWidthRatio">
+     <property name="text">
+      <string>Width Ratio (0.1 - 1.0):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QDoubleSpinBox" name="kcfg_widthRatio">
+     <property name="singleStep">
+      <double>0.05</double>
+     </property>
+     <property name="minimum">
+      <double>0.10</double>
+     </property>
+     <property name="maximum">
+      <double>1.00</double>
+     </property>
+     <property name="value">
+      <double>0.72</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelHeightRatio">
+     <property name="text">
+      <string>Height Ratio (0.1 - 1.0):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QDoubleSpinBox" name="kcfg_heightRatio">
+     <property name="singleStep">
+      <double>0.05</double>
+     </property>
+     <property name="minimum">
+      <double>0.10</double>
+     </property>
+     <property name="maximum">
+      <double>1.00</double>
+     </property>
+     <property name="value">
+      <double>0.78</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelYOffset">
+     <property name="text">
+      <string>Top Offset (pixels):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QSpinBox" name="kcfg_yOffset">
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>500</number>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelCustomWidth">
+     <property name="text">
+      <string>Custom Width (0 = use ratio):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QSpinBox" name="kcfg_customWidth">
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelCustomHeight">
+     <property name="text">
+      <string>Custom Height (0 = use ratio):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QSpinBox" name="kcfg_customHeight">
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labelScreenOverrides">
+     <property name="text">
+      <string>Per-Screen Overrides (JSON):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="kcfg_screenOverrides">
+     <property name="placeholderText">
+      <string>{"eDP-1": {"width": 1286, "height": 705}}</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
