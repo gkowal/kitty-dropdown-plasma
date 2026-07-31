@@ -132,12 +132,10 @@ If you prefer fixed pixel dimensions or custom placement over the script's defau
 
 ### Customizing Toggle Animations & Desktop Effects
 
-Show/hide transitions are managed natively by KDE Plasma's C++ GPU Desktop Effects engine:
+Show/hide transitions for drop-down windows are managed natively by KDE Plasma's C++ GPU Desktop Effects engine:
 
-- **Default Behavior**: Plasma 6 applies its default minimize effect (**Squish** or **Scale**), which smoothly scales the window in and out.
-- **Top-Down Sliding**: To get a Quake/Yakuake-style top-down slide animation, ensure **System Settings > Desktop Effects > Slide** is enabled. You can also create a Window Rule for `kitty-dropdown` adding property **Window type** -> **Force** -> **On Screen Display**.
-- **Instant Toggling (No Animation)**: To disable the shrink/scale animation, go to **System Settings > Desktop Effects** and uncheck **Squish** / **Scale** (or disable **Minimize Animation**).
-- **Animation Speed**: Global animation duration can be adjusted in **System Settings > Display & Monitor > Animation Speed**.
+- **Desktop Effects**: Open/close animations (such as **Slide**, **Squish**, or **Scale**) can be configured globally in **System Settings > Desktop Effects**.
+- **Animation Speed**: Global animation duration can be adjusted under **System Settings > Display & Monitor > Animation Speed** (or **System Settings > Desktop Effects**).
 
 ---
 
