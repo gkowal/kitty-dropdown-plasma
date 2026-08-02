@@ -69,6 +69,10 @@ systemctl --user daemon-reload
 - **Zero Resource Overhead at Boot:** Kitty is **not** launched at desktop startup, consuming 0 RAM and CPU.
 - **On-Demand Activation:** The first time you press the toggle shortcut (`Meta+F12`), the KWin script automatically starts the service via D-Bus.
 - **Self-Healing:** If Kitty crashes or is closed, pressing the shortcut automatically re-launches it on demand.
+- **Optional Enable at Boot:** The service includes an `[Install]` section, so you may run `systemctl --user enable kitty-dropdown.service` if you prefer Kitty to start automatically at login instead of on-demand.
+
+> [!NOTE]
+> Both launch methods use Kitty's `--hold` flag, which keeps the terminal window open if the shell process exits (e.g., crashes on a segfault or is OOM-killed). This prevents the window from disappearing unexpectedly, allowing you to inspect the state. The trade-off is that a crashed shell leaves a frozen terminal window — press `Meta+F12` again to re-launch.
 
 #### Method B: Traditional Autostart File (Non-Systemd Environments)
 
@@ -88,6 +92,9 @@ This launches Kitty minimized at desktop login so it is ready when you press the
 ### System Tray Integration (Optional)
 
 An optional system tray icon application (`kitty_tray.py`) is provided for users who prefer toggling the terminal via a tray icon in their KDE Plasma Panel.
+
+> [!NOTE]
+> The system tray autostart entry (`kitty-tray-autostart.desktop`) references the default KPackage install path (`~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`). It will only work with user-level installs via `kpackagetool6`. If you have installed the script system-wide, you will need to edit the `Exec` line in the copied `.desktop` file to point to the correct location.
 
 #### Prerequisites
 `kitty_tray.py` requires **Python 3** and **PyQt6**:
