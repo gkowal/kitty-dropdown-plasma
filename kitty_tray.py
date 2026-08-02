@@ -18,7 +18,10 @@ def main():
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
-    tray = QSystemTrayIcon(QIcon.fromTheme("utilities-terminal"), app)
+    icon = QIcon.fromTheme("utilities-terminal")
+    if icon.isNull():
+        icon = QIcon.fromTheme("terminal")
+    tray = QSystemTrayIcon(icon, app)
     tray.setToolTip("Toggle Kitty Dropdown")
     tray.activated.connect(
         lambda reason: toggle_kitty() if reason == QSystemTrayIcon.ActivationReason.Trigger else None
