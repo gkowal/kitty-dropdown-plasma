@@ -2,9 +2,6 @@ import subprocess
 import shutil
 from kittens.tui.handler import result_handler
 
-def main(args):
-    pass
-
 @result_handler(no_ui=True)
 def handle_result(args, result, target_window_id, boss):
     window = boss.window_id_map.get(target_window_id) or boss.active_window
@@ -23,8 +20,8 @@ def handle_result(args, result, target_window_id, boss):
                 if exe not in KNOWN_SHELLS:
                     window.write_to_child("\x04")
                     return
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"dropdown_manager: foreground process detection failed: {e}")
 
     # 2. Get the current active tab and OS window
     tab = getattr(window, 'tab', None) or boss.active_tab
