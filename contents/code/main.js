@@ -84,23 +84,23 @@ function applyGeometry(client, targetScreen) {
 
 	if (screenConfig) {
 		if (screenConfig.width !== undefined && screenConfig.width > 0) {
-			width = screenConfig.width;
+			width = Math.round(screenConfig.width);
 		} else if (screenConfig.widthRatio !== undefined && screenConfig.widthRatio > 0) {
-			width = Math.round(area.width * screenConfig.widthRatio);
+			width = Math.round(area.width * Math.max(0.1, Math.min(1.0, screenConfig.widthRatio)));
 		} else {
 			width = customWidth > 0 ? customWidth : Math.round(area.width * widthRatio);
 		}
 
 		if (screenConfig.height !== undefined && screenConfig.height > 0) {
-			height = screenConfig.height;
+			height = Math.round(screenConfig.height);
 		} else if (screenConfig.heightRatio !== undefined && screenConfig.heightRatio > 0) {
-			height = Math.round(area.height * screenConfig.heightRatio);
+			height = Math.round(area.height * Math.max(0.1, Math.min(1.0, screenConfig.heightRatio)));
 		} else {
 			height = customHeight > 0 ? customHeight : Math.round(area.height * heightRatio);
 		}
 
 		if (screenConfig.yOffset !== undefined) {
-			yOffset = screenConfig.yOffset;
+			yOffset = Math.max(0, Math.round(screenConfig.yOffset));
 		}
 	} else {
 		width = customWidth > 0 ? customWidth : Math.round(area.width * widthRatio);
