@@ -2,7 +2,7 @@
 Type=Application
 Name=Kitty Drop-Down System Tray
 Comment=System tray icon for Kitty Drop-Down Terminal
-Exec=python3 -c "import os, sys; exec(open(os.path.expanduser('~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty_tray.py')).read())"
+Exec=python3 ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty_tray.py
 Icon=utilities-terminal
 Terminal=false
 Categories=Utility;
