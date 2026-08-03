@@ -200,6 +200,14 @@ Show/hide transitions for drop-down windows are managed natively by KDE Plasma's
 - **Desktop Effects**: Window state animations (such as **Slide**, **Squish**, or **Scale**) can be configured in **System Settings > Animations** (or **System Settings > Desktop Effects** in earlier Plasma versions).
 - **Animation Speed**: Global animation speed can be adjusted via the speed slider in **System Settings > Animations** (or **System Settings > Desktop Effects**).
 
+### Known Limitation: One-Frame Flicker on Multi-Monitor Toggles
+
+When the drop-down is toggled open onto a **different monitor** than the one it was last shown on, the window may appear for a single frame on the previous monitor before appearing on the active one. This affects only cross-monitor toggles; toggling on the same monitor is unaffected.
+
+The cause is KWin window-manager behavior: geometry changes applied to a **minimized** window are deferred by KWin and only applied after the window is unminimized, so the window maps for one frame at its previous position before moving. KWin's scripting API offers no way to suppress this per-window transition, so it cannot be avoided from the script while the window is hidden by minimizing.
+
+The flicker is purely cosmetic — window content and final position are unaffected. This script intentionally avoids alternative hiding strategies (such as keeping the window mapped and parked off-screen) because they keep the window composited and rendering at all times, consuming CPU/GPU while hidden. If this limitation matters for your setup, a configurable off-screen hiding mode is a candidate future enhancement.
+
 ---
 
 ## 4. Smart EOF (Ctrl+D) Handling
