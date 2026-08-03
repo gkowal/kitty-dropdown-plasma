@@ -66,18 +66,14 @@ function applyGeometry(client, targetScreen) {
 	let yOffset = readConfig("yOffset", 1);
 	let screenOverridesStr = readConfig("screenOverrides", "");
 
-	print("applyGeometry: outputName=" + outputName + " screenOverridesStr=" + screenOverridesStr);
-
 	let screenConfig = null;
 	if (screenOverridesStr && screenOverridesStr.length > 0) {
 		try {
 			let parsed = JSON.parse(screenOverridesStr);
 			if (outputName && parsed[outputName]) {
 				screenConfig = parsed[outputName];
-				print("applyGeometry: matched screenConfig for " + outputName + ": " + JSON.stringify(screenConfig));
 			} else if (parsed["default"]) {
 				screenConfig = parsed["default"];
-				print("applyGeometry: using default screenConfig: " + JSON.stringify(screenConfig));
 			}
 		} catch (e) {
 			print("applyGeometry: failed to parse screenOverrides JSON: " + e.message);
@@ -136,24 +132,6 @@ function setupClient(client) {
 	if (targetScreen) {
 		applyGeometry(client, targetScreen);
 	}
-}
-
-function printClient(client) {
-	print("resourceName=" + client.resourceName.toString() +
-		";resourceClass=" + client.resourceClass.toString() +
-		";normalWindow=" + client.normalWindow +
-		";onAllDesktops=" + client.onAllDesktops +
-		";skipTaskbar=" + client.skipTaskbar +
-		";skipSwitcher=" + client.skipSwitcher +
-		";skipPager=" + client.skipPager +
-		";keepAbove=" + client.keepAbove +
-		";fullScreen=" + client.fullScreen +
-		"");
-}
-
-function getTargetGeometry(client) {
-	let screen = workspace.activeScreen;
-	return applyGeometry(client, screen);
 }
 
 function show(client) {
