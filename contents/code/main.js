@@ -3,6 +3,7 @@
 */
 
 var kittyLaunching = false;
+var lastScreenArea = null;
 
 function isKitty(client) {
 	if (!client || client.deleted || !client.normalWindow) return false;
@@ -46,12 +47,9 @@ function getScreenGeometry(screen) {
 	}
 }
 
-function isGeometryOnScreen(fg, screenArea) {
-	if (!fg || !screenArea) return false;
-	let centerX = fg.x + fg.width / 2;
-	let centerY = fg.y + fg.height / 2;
-	return (centerX >= screenArea.x && centerX < screenArea.x + screenArea.width &&
-	        centerY >= screenArea.y && centerY < screenArea.y + screenArea.height);
+function areasEqual(a, b) {
+	if (!a || !b) return false;
+	return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 }
 
 function applyGeometry(client, targetScreen) {
@@ -109,6 +107,15 @@ function applyGeometry(client, targetScreen) {
 		height = customHeight > 0 ? customHeight : Math.round(area.height * heightRatio);
 	}
 
+	if (width > area.width || height > area.height) {
+		let fbW = (screenConfig && screenConfig.widthRatio !== undefined && screenConfig.widthRatio > 0)
+			? screenConfig.widthRatio : widthRatio;
+		let fbH = (screenConfig && screenConfig.heightRatio !== undefined && screenConfig.heightRatio > 0)
+			? screenConfig.heightRatio : heightRatio;
+		width = Math.round(area.width * Math.max(0.1, Math.min(1.0, fbW)));
+		height = Math.round(area.height * Math.max(0.1, Math.min(1.0, fbH)));
+	}
+
 	let x = area.x + Math.round((area.width - width) / 2);
 	let y = area.y + yOffset;
 
@@ -118,6 +125,8 @@ function applyGeometry(client, targetScreen) {
 		width: width,
 		height: height
 	};
+
+	lastScreenArea = area;
 }
 
 function setupClient(client) {
@@ -137,15 +146,12 @@ function setupClient(client) {
 }
 
 function show(client) {
-	client.minimized = false;
 	let targetScreen = workspace.activeScreen;
-	if (targetScreen) {
-		let screenArea = getScreenGeometry(targetScreen);
-		let fg = client.frameGeometry;
-		if (screenArea && fg && !isGeometryOnScreen(fg, screenArea)) {
-			applyGeometry(client, targetScreen);
-		}
+	let area = targetScreen ? getScreenGeometry(targetScreen) : null;
+	if (area && !areasEqual(lastScreenArea, area)) {
+		applyGeometry(client, targetScreen);
 	}
+	client.minimized = false;
 }
 
 function hide(client) {
