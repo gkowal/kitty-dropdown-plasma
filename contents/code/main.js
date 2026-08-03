@@ -2,6 +2,8 @@
 # vim:tabstop=4:shiftwidth=4:noexpandtab
 */
 
+var kittyLaunching = false;
+
 function isKitty(client) {
 	if (!client || client.deleted || !client.normalWindow) return false;
 	let rClass = client.resourceClass ? client.resourceClass.toString() : "";
@@ -190,7 +192,8 @@ function toggleKitty() {
 			show(kitty);
 			activate(kitty);
 		}
-	} else {
+	} else if (!kittyLaunching) {
+		kittyLaunching = true;
 		launchKitty();
 	}
 }
@@ -198,8 +201,11 @@ function toggleKitty() {
 function setupKitty(client) {
 	if ( isKitty(client) ) {
 		setupClient(client);
-		show(client);
-		activate(client);
+		if (kittyLaunching) {
+			kittyLaunching = false;
+			show(client);
+			activate(client);
+		}
 	}
 }
 
