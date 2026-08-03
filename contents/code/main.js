@@ -177,6 +177,7 @@ function launchKitty() {
 					function(krunnerRes) {
 						if (!krunnerRes) {
 							print("launchKitty: both systemd and KRunner fallback failed to launch Kitty");
+							kittyLaunching = false;
 						}
 					}
 				);
@@ -198,7 +199,7 @@ function toggleKitty() {
 			show(kitty);
 			activate(kitty);
 		}
-	} else if (!kittyLaunching) {
+	} else {
 		kittyLaunching = true;
 		launchKitty();
 	}
