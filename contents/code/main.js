@@ -52,6 +52,37 @@ function areasEqual(a, b) {
 	return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 }
 
+function toPositiveInt(value) {
+	let n = Number(value);
+	if (!isFinite(n) || n <= 0) return 0;
+	return Math.round(n);
+}
+
+function toNonNegativeInt(value) {
+	let n = Number(value);
+	if (!isFinite(n) || n < 0) return 0;
+	return Math.round(n);
+}
+
+function toRatio(value, fallback) {
+	let n = Number(value);
+	if (!isFinite(n) || n <= 0) return fallback;
+	return Math.max(0.1, Math.min(1.0, n));
+}
+
+function parseScreenConfig(raw) {
+	if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+	let cfg = {};
+	if (raw.width !== undefined) cfg.width = toPositiveInt(raw.width);
+	if (raw.height !== undefined) cfg.height = toPositiveInt(raw.height);
+	let rw = toRatio(raw.widthRatio, 0);
+	if (rw > 0) cfg.widthRatio = rw;
+	let rh = toRatio(raw.heightRatio, 0);
+	if (rh > 0) cfg.heightRatio = rh;
+	if (raw.yOffset !== undefined) cfg.yOffset = toNonNegativeInt(raw.yOffset);
+	return cfg;
+}
+
 function applyGeometry(client, targetScreen) {
 	let area = getScreenGeometry(targetScreen);
 	if (!area) return;
@@ -59,22 +90,26 @@ function applyGeometry(client, targetScreen) {
 	let outputName = getOutputName(targetScreen);
 
 	// Read user settings via readConfig with default fallbacks
-	let widthRatio = readConfig("widthRatio", 0.72);
-	let heightRatio = readConfig("heightRatio", 0.78);
-	let customWidth = readConfig("customWidth", 0);
-	let customHeight = readConfig("customHeight", 0);
-	let yOffset = readConfig("yOffset", 1);
+	let widthRatio = toRatio(readConfig("widthRatio", 0.72), 0.72);
+	let heightRatio = toRatio(readConfig("heightRatio", 0.78), 0.78);
+	let customWidth = toPositiveInt(readConfig("customWidth", 0));
+	let customHeight = toPositiveInt(readConfig("customHeight", 0));
+	let yOffset = toNonNegativeInt(readConfig("yOffset", 1));
 	let screenOverridesStr = readConfig("screenOverrides", "");
 
 	let screenConfig = null;
 	if (screenOverridesStr && screenOverridesStr.length > 0) {
 		try {
 			let parsed = JSON.parse(screenOverridesStr);
-			if (outputName && parsed[outputName]) {
-				screenConfig = parsed[outputName];
-			} else if (parsed["default"]) {
-				screenConfig = parsed["default"];
+			let raw = null;
+			if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+				if (outputName && parsed[outputName]) {
+					raw = parsed[outputName];
+				} else if (parsed["default"]) {
+					raw = parsed["default"];
+				}
 			}
+			screenConfig = parseScreenConfig(raw);
 		} catch (e) {
 			print("applyGeometry: failed to parse screenOverrides JSON: " + e.message);
 		}
@@ -84,23 +119,23 @@ function applyGeometry(client, targetScreen) {
 
 	if (screenConfig) {
 		if (screenConfig.width !== undefined && screenConfig.width > 0) {
-			width = Math.round(screenConfig.width);
+			width = screenConfig.width;
 		} else if (screenConfig.widthRatio !== undefined && screenConfig.widthRatio > 0) {
-			width = Math.round(area.width * Math.max(0.1, Math.min(1.0, screenConfig.widthRatio)));
+			width = Math.round(area.width * screenConfig.widthRatio);
 		} else {
 			width = customWidth > 0 ? customWidth : Math.round(area.width * widthRatio);
 		}
 
 		if (screenConfig.height !== undefined && screenConfig.height > 0) {
-			height = Math.round(screenConfig.height);
+			height = screenConfig.height;
 		} else if (screenConfig.heightRatio !== undefined && screenConfig.heightRatio > 0) {
-			height = Math.round(area.height * Math.max(0.1, Math.min(1.0, screenConfig.heightRatio)));
+			height = Math.round(area.height * screenConfig.heightRatio);
 		} else {
 			height = customHeight > 0 ? customHeight : Math.round(area.height * heightRatio);
 		}
 
 		if (screenConfig.yOffset !== undefined) {
-			yOffset = Math.max(0, Math.round(screenConfig.yOffset));
+			yOffset = screenConfig.yOffset;
 		}
 	} else {
 		width = customWidth > 0 ? customWidth : Math.round(area.width * widthRatio);
@@ -113,10 +148,10 @@ function applyGeometry(client, targetScreen) {
 		let fbH = (screenConfig && screenConfig.heightRatio !== undefined && screenConfig.heightRatio > 0)
 			? screenConfig.heightRatio : heightRatio;
 		if (width > area.width) {
-			width = Math.round(area.width * Math.max(0.1, Math.min(1.0, fbW)));
+			width = Math.round(area.width * fbW);
 		}
 		if (height > area.height) {
-			height = Math.round(area.height * Math.max(0.1, Math.min(1.0, fbH)));
+			height = Math.round(area.height * fbH);
 		}
 	}
 
