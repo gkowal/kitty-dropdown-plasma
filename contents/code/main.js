@@ -37,7 +37,7 @@ function getOutputName(output) {
 function getScreenGeometry(screen) {
 	if (!screen) return null;
 	try {
-		return workspace.clientArea(2, screen, workspace.currentDesktop);
+		return workspace.clientArea(5, screen, workspace.currentDesktop);
 	} catch (e) {
 		try {
 			return workspace.clientArea(0, screen, workspace.currentDesktop);
