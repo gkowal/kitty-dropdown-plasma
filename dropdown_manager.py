@@ -2,6 +2,25 @@ import subprocess
 import shutil
 from kittens.tui.handler import result_handler
 
+def _invoke_shortcut(name):
+    qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6") or shutil.which("qdbus")
+    if not qdbus_cmd:
+        return None
+    try:
+        proc = subprocess.run([
+            qdbus_cmd,
+            "org.kde.kglobalaccel",
+            "/component/kwin",
+            "org.kde.kglobalaccel.Component.invokeShortcut",
+            name
+        ], capture_output=True, text=True, check=False)
+        return proc.returncode == 0
+    except Exception:
+        return None
+
+def main(args):
+    pass
+
 @result_handler(no_ui=True)
 def handle_result(args, result, target_window_id, boss):
     window = boss.window_id_map.get(target_window_id) or boss.active_window
@@ -38,20 +57,14 @@ def handle_result(args, result, target_window_id, boss):
     # 4. Handle the logic purely at the Tab level
     if tab_count == 1:
         # Last tab: Minimize the window natively via KDE Plasma D-Bus
-        qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6") or shutil.which("qdbus")
-        if qdbus_cmd:
-            subprocess.run([
-                qdbus_cmd,
-                "org.kde.kglobalaccel",
-                "/component/kwin",
-                "org.kde.kglobalaccel.Component.invokeShortcut",
-                "Window Minimize"
-            ], check=False)
-        else:
-            try:
-                boss.close_os_window()
-            except AttributeError:
-                pass
+        if _invoke_shortcut("Window Minimize"):
+            return
+        if _invoke_shortcut("Toggle Kitty"):
+            return
+        try:
+            boss.close_os_window()
+        except AttributeError:
+            print("dropdown_manager: failed to hide the window")
     else:
         # Multiple tabs: Close the active tab entirely
         try:
