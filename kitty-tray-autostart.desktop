@@ -2,7 +2,7 @@
 Type=Application
 Name=Kitty Drop-Down System Tray
 Comment=System tray icon for Kitty Drop-Down Terminal
-Exec=sh -c "exec \$HOME/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty_tray.py"
+Exec=sh -c "exec ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty_tray.py"
 Icon=utilities-terminal
 Terminal=false
 Categories=Utility;
