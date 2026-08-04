@@ -2,6 +2,8 @@ import subprocess
 import shutil
 from kittens.tui.handler import result_handler
 
+KNOWN_SHELLS = ('bash', 'zsh', 'fish', 'sh', 'nu', 'dash', 'tcsh', 'csh', 'ksh', 'elvish', 'pwsh', 'powershell', 'xonsh', 'oil', 'ion')
+
 def _invoke_shortcut(name):
     qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6") or shutil.which("qdbus")
     if not qdbus_cmd:
@@ -29,7 +31,6 @@ def handle_result(args, result, target_window_id, boss):
 
     # 1. Detect foreground process (SSH, Python, Vim, etc.)
     # If active process is not a local shell, send a standard Ctrl+D (\x04)
-    KNOWN_SHELLS = ('bash', 'zsh', 'fish', 'sh', 'nu', 'dash', 'tcsh', 'csh', 'ksh', 'elvish', 'pwsh', 'powershell', 'xonsh', 'oil', 'ion')
     try:
         fg_processes = getattr(window.child, 'foreground_processes', [])
         for p in fg_processes:
