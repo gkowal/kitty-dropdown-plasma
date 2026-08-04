@@ -212,7 +212,7 @@ function launchKitty() {
 					"/App",
 					"org.kde.krunner.App",
 					"query",
-					"kitty --single-instance --instance-group dropdown --class kitty-dropdown --override hide_window_decorations=yes --hold --config $HOME/.config/kitty/kitty-dropdown.conf",
+					"kitty --single-instance --instance-group dropdown --class kitty-dropdown --override hide_window_decorations=yes --hold --config ~/.config/kitty/kitty-dropdown.conf",
 					function(krunnerRes) {
 						if (!krunnerRes) {
 							print("launchKitty: both systemd and KRunner fallback failed to launch Kitty");
