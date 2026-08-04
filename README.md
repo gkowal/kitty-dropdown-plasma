@@ -55,15 +55,27 @@ While not strictly required, using a dedicated configuration file allows you to 
 
 You can choose between two methods to manage the Kitty process:
 
+> [!NOTE]
+> **Linked installs.** The commands below install the companion components as **symlinks** into your home directory, so the installed files always follow the repository (or the KDE Store package). Run `./setup.sh` from the repository root — or, if you installed the script from the KDE Store, run the same commands from `~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`, where the script auto-detects its installed location. Only **one** launch method may be installed (`service` **or** `autostart`); `setup.sh` enforces this and automatically switches between them. The plain `cp` installs documented in earlier releases remain a valid alternative if you do not want symlinks.
+
 #### Method A: On-Demand Systemd Service (Recommended)
 
 If your Linux distribution uses `systemd` user sessions (Fedora, Arch, Manjaro, openSUSE, Ubuntu, Debian, etc.), we strongly recommend using the provided systemd service:
 
 ```bash
+./setup.sh service
+```
+
+If you prefer not to use the script, link the file by hand:
+
+```bash
 mkdir -p ~/.config/systemd/user/
-cp kitty-dropdown.service ~/.config/systemd/user/
+ln -sf "$(pwd)/kitty-dropdown.service" ~/.config/systemd/user/
 systemctl --user daemon-reload
 ```
+
+> [!NOTE]
+> Because the unit file is symlinked, `git pull` updates it in place. After a pull, re-run `systemctl --user daemon-reload` (and restart the unit with `systemctl --user restart kitty-dropdown.service` if it is running) so systemd picks up the changes.
 
 **Why this is preferred:**
 - **Zero Resource Overhead at Boot:** Kitty is **not** launched at desktop startup, consuming 0 RAM and CPU.
@@ -79,7 +91,13 @@ systemctl --user daemon-reload
 If your system does not use `systemd` user sessions (e.g., Devuan, Gentoo/OpenRC, Void, Artix), you can launch Kitty automatically on desktop login using the provided `.desktop` file:
 
 ```bash
-cp kitty-autostart.desktop ~/.config/autostart/
+./setup.sh autostart
+```
+
+If you prefer not to use the script, link the file by hand:
+
+```bash
+ln -sf "$(pwd)/kitty-autostart.desktop" ~/.config/autostart/
 ```
 
 This launches Kitty minimized at desktop login so it is ready when you press the shortcut.
@@ -104,10 +122,22 @@ An optional system tray icon application (`kitty_tray.py`) is provided for users
 - **openSUSE**: `sudo zypper install python3-PyQt6`
 
 #### Enabling the System Tray Icon
-To have the system tray icon start automatically upon desktop login, copy the provided autostart desktop entry:
+To have the system tray icon start automatically upon desktop login, link the provided autostart desktop entry:
 
 ```bash
-cp ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty-tray-autostart.desktop ~/.config/autostart/
+./setup.sh tray
+```
+
+`setup.sh tray` links both `kitty_tray.py` into the KWin scripts directory and `kitty-tray-autostart.desktop` into `~/.config/autostart/`.
+
+> [!NOTE]
+> After `kpackagetool6 --upgrade` reinstalls the package, `kitty_tray.py` is recreated as a regular file (breaking the symlink), so re-run `./setup.sh tray`.
+
+If you prefer not to use the script, link the files by hand:
+
+```bash
+ln -sf "$(pwd)/kitty_tray.py" ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/
+ln -sf "$(pwd)/kitty-tray-autostart.desktop" ~/.config/autostart/
 ```
 
 Left-clicking the tray icon toggles the drop-down terminal (and auto-launches Kitty if not currently running). Right-clicking opens a context menu with:
@@ -236,9 +266,15 @@ The flicker is purely cosmetic — window content and final position are unaffec
 To prevent the drop-down window from closing when the last tab receives an EOF (`Ctrl+D`), this project provides a Python kitten that manages window state natively.
 
 ### Installation
-1. Move `dropdown_manager.py` to your kitty configuration directory:
+1. Link `dropdown_manager.py` to your kitty configuration directory:
 ```bash
-cp dropdown_manager.py ~/.config/kitty/
+./setup.sh kitten
+```
+
+If you prefer not to use the script, link the file by hand:
+
+```bash
+ln -sf "$(pwd)/dropdown_manager.py" ~/.config/kitty/
 ```
 
 2. Add the following mapping to your `kitty-dropdown.conf`:
