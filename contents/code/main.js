@@ -62,8 +62,9 @@ function containsRect(outer, inner) {
 function isMisplaced(client) {
 	let r = client.frameGeometry;
 	if (!r) return true;
-	for (let i = 0; i < workspace.screenCount; i++) {
-		let s = workspace.screenGeometry(i);
+	let screens = workspace.screens;
+	for (let i = 0; i < screens.length; i++) {
+		let s = screens[i].geometry;
 		if (s && containsRect(s, r)) return false;
 	}
 	return true;
