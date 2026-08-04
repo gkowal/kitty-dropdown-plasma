@@ -205,7 +205,8 @@ function setupClient(client) {
 function show(client) {
 	let targetScreen = workspace.activeScreen;
 	let area = targetScreen ? getScreenGeometry(targetScreen) : null;
-	if (area && (!areasEqual(lastScreenArea, area) || isMisplaced(client))) {
+	let recenterOnShow = readConfig("recenterOnShow", false);
+	if (area && (recenterOnShow || !areasEqual(lastScreenArea, area) || isMisplaced(client))) {
 		applyGeometry(client, targetScreen);
 	}
 	client.minimized = false;

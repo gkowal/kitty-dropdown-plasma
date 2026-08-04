@@ -142,6 +142,7 @@ The script includes a native KDE configuration interface accessible directly in 
 | **`customWidth`** | Integer | `0` | Explicit width in pixels (`0` = use `widthRatio`). |
 | **`customHeight`** | Integer | `0` | Explicit height in pixels (`0` = use `heightRatio`). |
 | **`screenOverrides`** | String (JSON) | `""` | Per-monitor JSON overrides keyed by output name. |
+| **`recenterOnShow`** | Bool | `false` | Re-apply the default position every time the window is shown (`false` keeps a manually moved position across toggles). |
 
 ---
 
@@ -187,9 +188,15 @@ kwriteconfig6 --file kwinrc --group Script-org.kde.kitty-dropdown-plasma --key w
 # Set per-monitor JSON overrides
 kwriteconfig6 --file kwinrc --group Script-org.kde.kitty-dropdown-plasma --key screenOverrides '{"eDP-1": {"width": 1286, "height": 705}}'
 
+# Always re-center the window on show
+kwriteconfig6 --file kwinrc --group Script-org.kde.kitty-dropdown-plasma --key recenterOnShow true
+
 # Apply changes instantly
 qdbus6 org.kde.KWin /KWin reconfigure
 ```
+
+> [!NOTE]
+> **Config changes require a script reload.** KWin reads the script's configuration once when the script loads and caches it, so `reconfigure` alone may not pick up new values. After editing `kwinrc` (or the System Settings page), reload the script — e.g. toggle it off/on in **System Settings > Window Management > KWin Scripts**, or log out and back in.
 
 ---
 
