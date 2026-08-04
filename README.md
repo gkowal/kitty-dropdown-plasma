@@ -110,7 +110,21 @@ To have the system tray icon start automatically upon desktop login, copy the pr
 cp ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/kitty-tray-autostart.desktop ~/.config/autostart/
 ```
 
-Left-clicking the tray icon toggles the drop-down terminal (and auto-launches Kitty if not currently running). Right-clicking opens a context menu with options to toggle or exit the tray application.
+Left-clicking the tray icon toggles the drop-down terminal (and auto-launches Kitty if not currently running). Right-clicking opens a context menu with:
+
+- **Toggle Kitty** — show/hide the drop-down terminal (same as left-click).
+- **Settings...** — open the tray settings dialog (see below).
+- **Exit** — quit the tray application.
+
+#### Tray Settings Dialog
+
+The **Settings...** entry opens a dialog mirroring the KWin script's configuration page ([Configuration Options & Defaults](#configuration-options--defaults)) — window geometry, per-screen overrides, and re-center behavior — without opening System Settings.
+
+Clicking **Apply** (or **OK**):
+
+1. Writes the values to `kwinrc` under `[Script-org.kde.kitty-dropdown-plasma]` via `kwriteconfig6`.
+2. Refreshes KWin's script configuration (`org.kde.kwin.Scripting.start()`) so the running script reads the new values.
+3. Reloads the KWin script, re-applying the geometry to the current window immediately — the drop-down resizes in place, with no logout or manual script re-enable required.
 
 ---
 
@@ -196,7 +210,7 @@ qdbus6 org.kde.KWin /KWin reconfigure
 ```
 
 > [!NOTE]
-> **Config changes require a script reload.** KWin reads the script's configuration once when the script loads and caches it, so `reconfigure` alone may not pick up new values. After editing `kwinrc` (or the System Settings page), reload the script — e.g. toggle it off/on in **System Settings > Window Management > KWin Scripts**, or log out and back in.
+> **Applying config changes.** KWin caches `kwinrc` in memory, so run `reconfigure` after editing the file so the running script reads the new values. The window geometry is only re-applied when the script re-runs its setup, so to see the change immediately reload the script — toggle it off/on in **System Settings > Window Management > KWin Scripts**, log out and back in, or use the tray's **Settings...** dialog, which writes, refreshes, and reloads automatically.
 
 ---
 
