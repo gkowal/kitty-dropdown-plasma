@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import os
 import sys
+from PyQt6.QtCore import QLockFile
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon
 from PyQt6.QtDBus import QDBusConnection, QDBusMessage
@@ -47,6 +49,12 @@ def toggle_kitty(tray):
         tray.showMessage("Kitty Dropdown", f"Failed to toggle: {err}", QSystemTrayIcon.Warning, 5000)
 
 def main():
+    lock_dir = os.environ.get("XDG_RUNTIME_DIR") or "/tmp"
+    lock = QLockFile(os.path.join(lock_dir, "kitty-dropdown-tray.lock"))
+    if not lock.tryLock(100):
+        print("kitty_tray: another instance is already running", file=sys.stderr)
+        sys.exit(0)
+
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
