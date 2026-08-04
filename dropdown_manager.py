@@ -71,5 +71,4 @@ def handle_result(args, result, target_window_id, boss):
         try:
             boss.close_tab()
         except AttributeError:
-            for w in list(tab.windows):
-                w.close_window()
+            print("dropdown_manager: failed to close the active tab")
