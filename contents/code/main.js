@@ -112,8 +112,12 @@ function applyGeometry(client, targetScreen) {
 			? screenConfig.widthRatio : widthRatio;
 		let fbH = (screenConfig && screenConfig.heightRatio !== undefined && screenConfig.heightRatio > 0)
 			? screenConfig.heightRatio : heightRatio;
-		width = Math.round(area.width * Math.max(0.1, Math.min(1.0, fbW)));
-		height = Math.round(area.height * Math.max(0.1, Math.min(1.0, fbH)));
+		if (width > area.width) {
+			width = Math.round(area.width * Math.max(0.1, Math.min(1.0, fbW)));
+		}
+		if (height > area.height) {
+			height = Math.round(area.height * Math.max(0.1, Math.min(1.0, fbH)));
+		}
 	}
 
 	let x = area.x + Math.round((area.width - width) / 2);
