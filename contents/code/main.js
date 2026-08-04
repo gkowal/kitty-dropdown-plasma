@@ -52,6 +52,23 @@ function areasEqual(a, b) {
 	return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 }
 
+function containsRect(outer, inner) {
+	return outer.x <= inner.x
+		&& outer.y <= inner.y
+		&& outer.x + outer.width >= inner.x + inner.width
+		&& outer.y + outer.height >= inner.y + inner.height;
+}
+
+function isMisplaced(client) {
+	let r = client.frameGeometry;
+	if (!r) return true;
+	for (let i = 0; i < workspace.screenCount; i++) {
+		let s = workspace.screenGeometry(i);
+		if (s && containsRect(s, r)) return false;
+	}
+	return true;
+}
+
 function toPositiveInt(value) {
 	let n = Number(value);
 	if (!isFinite(n) || n <= 0) return 0;
@@ -187,7 +204,7 @@ function setupClient(client) {
 function show(client) {
 	let targetScreen = workspace.activeScreen;
 	let area = targetScreen ? getScreenGeometry(targetScreen) : null;
-	if (area && !areasEqual(lastScreenArea, area)) {
+	if (area && (!areasEqual(lastScreenArea, area) || isMisplaced(client))) {
 		applyGeometry(client, targetScreen);
 	}
 	client.minimized = false;
