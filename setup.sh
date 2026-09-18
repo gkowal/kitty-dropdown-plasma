@@ -21,7 +21,7 @@ fi
 
 usage() {
 	cat <<'EOF'
-Usage: ./setup.sh <component> [<component> ...]
+Usage: ./setup.sh [--force] <component> [<component> ...]
 
 Links the companion components of Kitty Drop-Down Plasma into their install
 locations as symlinks, so updates propagate when the source changes.
@@ -33,17 +33,36 @@ Components:
   tray       kitty_tray.py             -> ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/
              kitty-tray-autostart.desktop -> ~/.config/autostart/
 
+Options:
+  --force, -f   Replace an existing regular file at the destination with
+                a symlink (a timestamped backup `<target>.bak-*` is kept).
+                Without this flag, an existing regular file is an error
+                and nothing is replaced.
+
 Note: 'service' and 'autostart' are mutually exclusive (only one launch
 method). Requesting both is an error; linking one removes the other's link.
 EOF
 }
 
+force=0
+
 link_file() {
-	local src="$1" target="$2" dir
+	local src="$1" target="$2" dir backup
 	[[ -f "$src" ]] || { echo "warning: missing $src, skipping" >&2; return 1; }
 	if [[ -e "$target" && ! -L "$target" ]]; then
-		echo "warning: replacing regular file $target with a symlink" >&2
-		echo "         (back up the file first if you modified it)" >&2
+		if [[ "$force" -eq 0 ]]; then
+			echo "error: $target already exists as a regular file; refusing to replace it" >&2
+			echo "       back it up or remove it manually, or re-run with --force" >&2
+			return 1
+		fi
+		backup="$target.bak-$(date +%Y%m%d-%H%M%S)-$$"
+		n=0
+		while [[ -e "$backup" ]]; do
+			n=$((n + 1))
+			backup="$target.bak-$(date +%Y%m%d-%H%M%S)-$$-$n"
+		done
+		cp -p "$target" "$backup" || return 1
+		echo "backed up $target to $backup"
 	fi
 	dir="$(dirname "$target")"
 	mkdir -p "$dir"
@@ -117,12 +136,20 @@ else
 	echo "Source: installed package at $script_dir"
 fi
 
+have_component=0
+# Pre-scan flags so option order does not matter (e.g. `kitten --force`).
 for arg in "$@"; do
 	case "$arg" in
-		kitten) do_kitten ;;
-		service) do_service ;;
-		autostart) do_autostart ;;
-		tray) do_tray ;;
+		--force|-f) force=1 ;;
+	esac
+done
+for arg in "$@"; do
+	case "$arg" in
+		--force|-f) ;;
+		kitten) do_kitten; have_component=1 ;;
+		service) do_service; have_component=1 ;;
+		autostart) do_autostart; have_component=1 ;;
+		tray) do_tray; have_component=1 ;;
 		*)
 			echo "error: unknown component '$arg'" >&2
 			usage
@@ -130,3 +157,8 @@ for arg in "$@"; do
 			;;
 	esac
 done
+
+if [[ "$have_component" -eq 0 ]]; then
+	usage
+	exit 1
+fi
