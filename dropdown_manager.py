@@ -30,18 +30,28 @@ def handle_result(args, result, target_window_id, boss):
         return
 
     # 1. Detect foreground process (SSH, Python, Vim, etc.)
-    # If active process is not a local shell, send a standard Ctrl+D (\x04)
+    # If active process is not a local shell, send a standard Ctrl+D (\x04).
+    # Smart-EOF handling below only runs after positively identifying a
+    # local shell: any missing or unparseable process data fails safe by
+    # forwarding Ctrl+D unchanged instead of closing or hiding anything.
+    forward_eof = True
     try:
-        fg_processes = getattr(window.child, 'foreground_processes', [])
+        fg_processes = getattr(window.child, 'foreground_processes', None)
+        if not fg_processes:
+            raise ValueError("no foreground process data")
         for p in fg_processes:
-            cmd = p.get('cmdline', [])
-            if cmd:
-                exe = cmd[0].split('/')[-1]
-                if exe not in KNOWN_SHELLS:
-                    window.write_to_child("\x04")
-                    return
+            cmd = p.get('cmdline', []) or []
+            if not cmd or not isinstance(cmd[0], str):
+                raise ValueError("unparseable foreground process entry")
+            if cmd[0].split('/')[-1] not in KNOWN_SHELLS:
+                break
+        else:
+            forward_eof = False
     except Exception as e:
         print(f"dropdown_manager: foreground process detection failed: {e}")
+    if forward_eof:
+        window.write_to_child("\x04")
+        return
 
     # 2. Get the current active tab and OS window
     tab = getattr(window, 'tab', None) or boss.active_tab
