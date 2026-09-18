@@ -87,18 +87,34 @@ unlink_linked() {
 	fi
 }
 
+# systemctl is absent on non-systemd systems (the audience for the
+# autostart launch method); never let its absence fail an install.
+have_systemctl() {
+	command -v systemctl >/dev/null 2>&1
+}
+
 do_service() {
 	unlink_linked "$AUTOSTART_DIR/kitty-autostart.desktop"
 	link_file "$script_dir/kitty-dropdown.service" "$SYSTEMD_DIR/kitty-dropdown.service"
-	systemctl --user daemon-reload
+	if have_systemctl; then
+		systemctl --user daemon-reload
+	else
+		echo "warning: systemctl not found; skipping daemon-reload" >&2
+	fi
 	echo "note: systemd unit registered; 'git pull' users: re-run 'systemctl --user daemon-reload' after pulling"
 }
 
 do_autostart() {
 	unlink_linked "$SYSTEMD_DIR/kitty-dropdown.service"
-	systemctl --user disable kitty-dropdown.service 2>/dev/null || true
+	if have_systemctl; then
+		systemctl --user disable kitty-dropdown.service 2>/dev/null || true
+	fi
 	link_file "$script_dir/kitty-autostart.desktop" "$AUTOSTART_DIR/kitty-autostart.desktop"
-	systemctl --user daemon-reload
+	if have_systemctl; then
+		systemctl --user daemon-reload
+	else
+		echo "note: systemctl not found; skipping daemon-reload (not needed without systemd)" >&2
+	fi
 }
 
 do_kitten() {
