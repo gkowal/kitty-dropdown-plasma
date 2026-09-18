@@ -57,15 +57,14 @@ def handle_result(args, result, target_window_id, boss):
 
     # 4. Handle the logic purely at the Tab level
     if tab_count == 1:
-        # Last tab: Minimize the window natively via KDE Plasma D-Bus
+        # Last tab: hide the window via KWin. Never destroy the OS
+        # window here: losing the hide mechanisms must not turn a
+        # harmless Ctrl+D into session loss.
         if _invoke_shortcut("Window Minimize"):
             return
         if _invoke_shortcut("Toggle Kitty"):
             return
-        try:
-            boss.close_os_window()
-        except AttributeError:
-            print("dropdown_manager: failed to hide the window")
+        print("dropdown_manager: unable to hide the window; leaving it intact")
     else:
         # Multiple tabs: Close the active tab entirely
         try:
