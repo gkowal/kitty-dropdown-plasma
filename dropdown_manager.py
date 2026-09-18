@@ -25,7 +25,9 @@ def main(args):
 
 @result_handler(no_ui=True)
 def handle_result(args, result, target_window_id, boss):
-    window = boss.window_id_map.get(target_window_id) or boss.active_window
+    # Never fall back to whichever window happens to be active: a stale
+    # target id must abort instead of acting on an unrelated terminal.
+    window = boss.window_id_map.get(target_window_id)
     if not window:
         return
 
@@ -53,8 +55,8 @@ def handle_result(args, result, target_window_id, boss):
         window.write_to_child("\x04")
         return
 
-    # 2. Get the current active tab and OS window
-    tab = getattr(window, 'tab', None) or boss.active_tab
+    # 2. Get the tab of the target window (no active-tab fallback).
+    tab = getattr(window, 'tab', None)
     if not tab:
         return
 
