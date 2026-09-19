@@ -14,7 +14,7 @@ def _shell_exe_name(cmd0):
 def _invoke_shortcut(name):
     qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6") or shutil.which("qdbus")
     if not qdbus_cmd:
-        return None
+        return False
     try:
         proc = subprocess.run([
             qdbus_cmd,
@@ -22,10 +22,12 @@ def _invoke_shortcut(name):
             "/component/kwin",
             "org.kde.kglobalaccel.Component.invokeShortcut",
             name
-        ], capture_output=True, text=True, check=False)
+        ], capture_output=True, text=True, check=False, timeout=3)
+        # A local qdbus call answers in milliseconds; anything slower is
+        # treated as failure so one Ctrl+D can never hang the terminal.
         return proc.returncode == 0
     except Exception:
-        return None
+        return False
 
 def main(args):
     pass
