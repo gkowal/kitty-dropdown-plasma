@@ -56,7 +56,7 @@ While not strictly required, using a dedicated configuration file allows you to 
 You can choose between two methods to manage the Kitty process:
 
 > [!NOTE]
-> **Linked installs.** The commands below install the companion components as **symlinks** into your home directory, so the installed files always follow the repository (or the KDE Store package). Run `./setup.sh` from the repository root, an unpacked release archive, or — if you installed the script from the KDE Store — from `~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`, where the script auto-detects its installed location. Only **one** launch method may be installed (`service` **or** `autostart`); `setup.sh` enforces this and automatically switches between them. The plain `cp` installs documented in earlier releases remain a valid alternative if you do not want symlinks.
+> **Linked installs.** The commands below install the companion components as **symlinks** into your home directory, so the installed files always follow the repository (or the KDE Store package). Run `./setup.sh` from the repository root, an unpacked release archive, or — if you installed the script from the KDE Store — from `~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`, where the script auto-detects its installed location. Only **one** launch method may be installed (`service` **or** `autostart`); `setup.sh` refuses to install both at once and automatically removes the other's link when it created it. Files you installed by hand (regular files, not symlinks from this source) are left untouched — remove those manually when switching methods. The plain `cp` installs documented in earlier releases remain a valid alternative if you do not want symlinks.
 
 #### Method A: On-Demand Systemd Service (Recommended)
 
@@ -84,7 +84,7 @@ systemctl --user daemon-reload
 - **Optional Enable at Boot:** The service includes an `[Install]` section, so you may run `systemctl --user enable kitty-dropdown.service` if you prefer Kitty to start automatically at login instead of on-demand.
 
 > [!NOTE]
-> Both launch methods use Kitty's `--hold` flag, which keeps the terminal window open if the shell process exits (e.g., crashes on a segfault or is OOM-killed). This prevents the window from disappearing unexpectedly, allowing you to inspect the state. The trade-off is that a crashed shell leaves a frozen terminal window — press `Meta+F12` again to re-launch.
+> Both launch methods use Kitty's `--hold` flag, which keeps the terminal window open if the shell process exits (e.g., crashes on a segfault or is OOM-killed). This prevents the window from disappearing unexpectedly, allowing you to inspect the state. The trade-off is that a crashed shell leaves a frozen terminal window — press `Meta+F12` to bring it back (nothing is re-launched; open a new tab inside it for a fresh shell).
 
 #### Method B: Traditional Autostart File (Non-Systemd Environments)
 
@@ -112,7 +112,7 @@ This launches Kitty minimized at desktop login so it is ready when you press the
 An optional system tray icon application (`kitty_tray.py`) is provided for users who prefer toggling the terminal via a tray icon in their KDE Plasma Panel.
 
 > [!NOTE]
-> The system tray autostart entry (`kitty-tray-autostart.desktop`) references the default KPackage install path (`~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`). It will only work with user-level installs via `kpackagetool6`. If you have installed the script system-wide, you will need to edit the `Exec` line in the copied `.desktop` file to point to the correct location.
+> The system tray autostart entry (`kitty-tray-autostart.desktop`) references the default KPackage install path (`~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`). It will only work with user-level installs via `kpackagetool6`. If you have installed the script system-wide, you will need to edit the `Exec` line in the copied `.desktop` file to point to the correct location; the tray's Settings reload follows the tray script itself (provided the package's `contents/` ships alongside it), so no other path needs editing.
 
 #### Prerequisites
 `kitty_tray.py` requires **Python 3** and **PyQt6**:
