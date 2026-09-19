@@ -124,11 +124,11 @@ do_kitten() {
 do_tray() {
 	if [[ "$mode" == "clone" ]]; then
 		if [[ ! -d "$KWN_SCRIPTS_DIR" ]]; then
-			echo "warning: $KWN_SCRIPTS_DIR does not exist (kpackagetool6 --install not run yet);" >&2
-			echo "         skipping the kitty_tray.py link" >&2
-		else
-			link_file "$script_dir/kitty_tray.py" "$KWN_SCRIPTS_DIR/kitty_tray.py"
+			echo "error: $KWN_SCRIPTS_DIR does not exist (run kpackagetool6 --install first);" >&2
+			echo "       refusing to install an autostart entry pointing at a missing script" >&2
+			return 1
 		fi
+		link_file "$script_dir/kitty_tray.py" "$KWN_SCRIPTS_DIR/kitty_tray.py"
 	else
 		echo "note: kitty_tray.py already lives in the installed package; updates come via 'kpackagetool6 --upgrade'"
 	fi
