@@ -166,10 +166,11 @@ def _reject_constant(value):
 def _validate_screen_overrides(text):
     """Check per-screen overrides JSON before it is written to kwinrc.
 
-    Mirrors the semantics of parseScreenConfig() in contents/code/main.js:
-    values main.js would silently ignore (or that fail JSON parsing) are
-    rejected here so the dialog never reports success for dead config.
-    Returns (True, "") when acceptable, else (False, reason).
+    Mirrors the semantics of parseScreenConfig() in contents/code/main.js,
+    except fractional pixels (which main.js would round) are rejected as
+    probable typos; only future tray writes are gated, main.js stays
+    tolerant of existing configs. Returns (True, "") when acceptable,
+    else (False, reason).
     """
     if not text.strip():
         return True, ""
@@ -189,12 +190,19 @@ def _validate_screen_overrides(text):
                 return False, f'"{output}.{key}" must be a number, not true/false'
             if not isinstance(value, (int, float)) or not math.isfinite(value):
                 return False, f'"{output}.{key}" must be a finite number'
-            if key in ("width", "height", "widthRatio", "heightRatio"):
+            if key in ("width", "height", "yOffset"):
+                # Whole pixels: main.js rounds, but a fraction here is
+                # virtually always a typo (1286.0 is fine; 1286.5 is not).
+                if isinstance(value, float) and not value.is_integer():
+                    return False, f'"{output}.{key}" must be whole pixels'
+                if key == "yOffset":
+                    if value < 0:
+                        return False, f'"{output}.{key}" must not be negative'
+                elif value <= 0:
+                    return False, f'"{output}.{key}" must be positive'
+            elif key in ("widthRatio", "heightRatio"):
                 if value <= 0:
                     return False, f'"{output}.{key}" must be positive'
-            elif key == "yOffset":
-                if value < 0:
-                    return False, f'"{output}.{key}" must not be negative'
     return True, ""
 
 def _refresh_kwin_scripts(tray):

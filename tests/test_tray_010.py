@@ -64,6 +64,13 @@ class ValidateOverridesTest(unittest.TestCase):
         self.check('{"eDP-1": {"width": 1e400}}', False)
         self.check('{"eDP-1": {"yOffset": NaN}}', False)
 
+    def test_fractional_pixels_rejected(self):
+        self.check('{"eDP-1": {"width": 1286.5}}', False)
+        self.check('{"eDP-1": {"height": 705.25}}', False)
+        self.check('{"eDP-1": {"yOffset": 1.5}}', False)
+        self.check('{"eDP-1": {"width": 1286.0}}', True)
+        self.check('{"eDP-1": {"widthRatio": 0.725}}', True)
+
     def test_apply_validates_before_writing(self):
         import inspect
         src = inspect.getsource(tray_mod.SettingsDialog._apply)
