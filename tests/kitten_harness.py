@@ -44,6 +44,25 @@ class FakeWindow:
         self.tab = tab
         self.written = []
 
+    def tabref(self):
+        # Mirrors kitty's Window: the tab is exposed only as a weakref.
+        return self.tab
+
+    def write_to_child(self, data):
+        self.written.append(data)
+
+
+class RealShapeWindow:
+    """Window shaped like kitty's real Window: no `.tab` attribute at
+    all, tab available only via `.tabref()` (see kitty/window.py)."""
+    def __init__(self, fg=None, tab=None):
+        self.child = FakeChild(fg if fg is not None else [])
+        self._tab = tab
+        self.written = []
+
+    def tabref(self):
+        return self._tab
+
     def write_to_child(self, data):
         self.written.append(data)
 
@@ -67,9 +86,11 @@ class FakeBoss:
         self.wid = wid
         self.close_tab_calls = 0
         self.close_os_window_calls = 0
+        self.closed_tab = None
 
-    def close_tab(self):
+    def close_tab(self, tab=None):
         self.close_tab_calls += 1
+        self.closed_tab = tab
 
     def close_os_window(self):
         self.close_os_window_calls += 1

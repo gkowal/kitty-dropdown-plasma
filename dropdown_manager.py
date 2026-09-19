@@ -64,9 +64,14 @@ def handle_result(args, result, target_window_id, boss):
         window.write_to_child("\x04")
         return
 
-    # 2. Get the tab of the target window (no active-tab fallback).
-    tab = getattr(window, 'tab', None)
-    if not tab:
+    # 2. Resolve the tab of the target window. Kitty's Window has no
+    # `.tab` attribute -- only the `.tabref()` weak reference -- so look
+    # it up exactly that way. A missing reference means a detached
+    # window; abort instead of guessing (no active-tab fallback: that
+    # could close or hide an unrelated terminal).
+    tabref = getattr(window, 'tabref', None)
+    tab = tabref() if callable(tabref) else None
+    if tab is None:
         return
 
     os_window = boss.os_window_map.get(tab.os_window_id)
@@ -87,8 +92,9 @@ def handle_result(args, result, target_window_id, boss):
             return
         print("dropdown_manager: unable to hide the window; leaving it intact")
     else:
-        # Multiple tabs: Close the active tab entirely
+        # Multiple tabs: close the target tab explicitly (not merely
+        # the active one, in case focus moved since Ctrl+D).
         try:
-            boss.close_tab()
-        except AttributeError:
-            print("dropdown_manager: failed to close the active tab")
+            boss.close_tab(tab)
+        except (AttributeError, TypeError):
+            print("dropdown_manager: failed to close the target tab")
