@@ -56,7 +56,7 @@ While not strictly required, using a dedicated configuration file allows you to 
 You can choose between two methods to manage the Kitty process:
 
 > [!NOTE]
-> **Linked installs.** The commands below install the companion components as **symlinks** into your home directory, so the installed files always follow the repository (or the KDE Store package). Run `./setup.sh` from the repository root — or, if you installed the script from the KDE Store, run the same commands from `~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`, where the script auto-detects its installed location. Only **one** launch method may be installed (`service` **or** `autostart`); `setup.sh` enforces this and automatically switches between them. The plain `cp` installs documented in earlier releases remain a valid alternative if you do not want symlinks.
+> **Linked installs.** The commands below install the companion components as **symlinks** into your home directory, so the installed files always follow the repository (or the KDE Store package). Run `./setup.sh` from the repository root, an unpacked release archive, or — if you installed the script from the KDE Store — from `~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`, where the script auto-detects its installed location. Only **one** launch method may be installed (`service` **or** `autostart`); `setup.sh` enforces this and automatically switches between them. The plain `cp` installs documented in earlier releases remain a valid alternative if you do not want symlinks.
 
 #### Method A: On-Demand Systemd Service (Recommended)
 

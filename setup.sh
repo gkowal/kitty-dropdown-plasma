@@ -12,9 +12,17 @@ if [[ -e "$script_dir/.git" ]]; then
 	mode="clone"
 elif [[ "$script_dir" == "$KWN_SCRIPTS_DIR" ]]; then
 	mode="installed"
+elif [[ -f "$script_dir/dropdown_manager.py" \
+	&& -f "$script_dir/kitty_tray.py" \
+	&& -f "$script_dir/kitty-dropdown.service" \
+	&& -f "$script_dir/contents/code/main.js" ]]; then
+	# Unpacked archive (e.g. ZIP download): a source tree without .git.
+	# Treated like a clone for linking (links point back into this tree).
+	mode="archive"
 else
 	echo "error: cannot determine source directory from $script_dir" >&2
-	echo "       run this script from the repository clone or from" >&2
+	echo "       run this script from the repository clone, an unpacked" >&2
+	echo "       release archive, or from" >&2
 	echo "       $KWN_SCRIPTS_DIR (KDE Store install)." >&2
 	exit 1
 fi
@@ -122,7 +130,7 @@ do_kitten() {
 }
 
 do_tray() {
-	if [[ "$mode" == "clone" ]]; then
+	if [[ "$mode" != "installed" ]]; then
 		if [[ ! -d "$KWN_SCRIPTS_DIR" ]]; then
 			echo "error: $KWN_SCRIPTS_DIR does not exist (run kpackagetool6 --install first);" >&2
 			echo "       refusing to install an autostart entry pointing at a missing script" >&2
@@ -148,6 +156,8 @@ fi
 
 if [[ "$mode" == "clone" ]]; then
 	echo "Source: git clone at $script_dir"
+elif [[ "$mode" == "archive" ]]; then
+	echo "Source: unpacked archive at $script_dir"
 else
 	echo "Source: installed package at $script_dir"
 fi
