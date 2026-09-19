@@ -14,7 +14,31 @@ function isKitty(client) {
 
 function findKitty() {
 	let clients = workspace.windowList();
-	return clients.find(client => isKitty(client)) || null;
+	let matches = clients.filter(client => isKitty(client));
+	if (matches.length <= 1) return matches[0] || null;
+	// Several dropdown windows (e.g. manually launched copies):
+	// prefer the one on the active screen for deterministic toggles.
+	let screen = workspace.activeScreen;
+	if (screen) {
+		let s = null;
+		try {
+			s = getScreenGeometry(screen);
+		} catch (e) {
+			s = null;
+		}
+		if (s) {
+			for (let i = 0; i < matches.length; i++) {
+				let r = matches[i].frameGeometry;
+				if (!r) continue;
+				let cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+				if (cx >= s.x && cx < s.x + s.width
+					&& cy >= s.y && cy < s.y + s.height) {
+					return matches[i];
+				}
+			}
+		}
+	}
+	return matches[0];
 }
 
 function isVisible(client) {
@@ -259,6 +283,13 @@ function toggleKitty() {
 			activate(kitty);
 		}
 	} else {
+		// No dropdown window: (re)launch. Deliberately no
+		// `if (kittyLaunching) return` guard here: launch failure
+		// is unobservable from the script (see launchKitty), so a
+		// permanent guard could wedge the toggle after one failed
+		// launch; and duplicate StartUnit requests are harmless
+		// because systemd replaces the queued job. Every press
+		// while no window exists simply retries.
 		kittyLaunching = true;
 		launchKitty();
 	}
