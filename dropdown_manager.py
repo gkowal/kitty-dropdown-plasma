@@ -4,6 +4,13 @@ from kittens.tui.handler import result_handler
 
 KNOWN_SHELLS = ('bash', 'zsh', 'fish', 'sh', 'nu', 'dash', 'tcsh', 'csh', 'ksh', 'elvish', 'pwsh', 'powershell', 'xonsh', 'oil', 'ion')
 
+def _shell_exe_name(cmd0):
+    # Basename with one login-shell leading dash stripped, so `-zsh`
+    # and `-bash` classify as shells. Anything else (versioned app
+    # binaries, wrappers such as sudo/tmux) intentionally stays
+    # non-shell: forwarding Ctrl+D there is the safe direction.
+    return cmd0.split('/')[-1].removeprefix('-')
+
 def _invoke_shortcut(name):
     qdbus_cmd = shutil.which("qdbus6") or shutil.which("qdbus-qt6") or shutil.which("qdbus")
     if not qdbus_cmd:
@@ -45,7 +52,7 @@ def handle_result(args, result, target_window_id, boss):
             cmd = p.get('cmdline', []) or []
             if not cmd or not isinstance(cmd[0], str):
                 raise ValueError("unparseable foreground process entry")
-            if cmd[0].split('/')[-1] not in KNOWN_SHELLS:
+            if _shell_exe_name(cmd[0]) not in KNOWN_SHELLS:
                 break
         else:
             forward_eof = False
