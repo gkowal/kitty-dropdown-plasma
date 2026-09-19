@@ -174,7 +174,9 @@ function applyGeometry(client, targetScreen) {
 	}
 
 	let x = area.x + Math.round((area.width - width) / 2);
-	let y = area.y + yOffset;
+	// Keep the window inside the usable area: an oversized yOffset
+	// (e.g. from screenOverrides) must not push it off-screen.
+	let y = area.y + Math.min(yOffset, Math.max(0, area.height - height));
 
 	client.frameGeometry = {
 		x: x,
