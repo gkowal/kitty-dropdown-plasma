@@ -4,6 +4,8 @@ Description=Kitty Drop-Down Terminal Service
 [Service]
 Type=simple
 ExecStart=/usr/bin/env kitty --single-instance --instance-group dropdown --class kitty-dropdown --override hide_window_decorations=yes --hold --config %h/.config/kitty/kitty-dropdown.conf
+# No automatic restart: pressing the toggle shortcut re-starts the unit
+# on demand via StartUnit, so a crash is recovered on the next toggle.
 Restart=no
 
 [Install]
