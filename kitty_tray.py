@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import json
+import math
 import os
 import subprocess
 import sys
@@ -130,6 +132,51 @@ def _parse_int(value, default):
     except (TypeError, ValueError):
         return default
 
+
+_OVERRIDE_KEYS = ("width", "height", "widthRatio", "heightRatio", "yOffset")
+
+
+def _reject_constant(value):
+    # Python's json accepts NaN/Infinity/-Infinity, but JSON.parse in the
+    # KWin script rejects them (and 1e400 overflows to Infinity there too),
+    # so main.js would discard the whole overrides object. Reject upfront.
+    raise ValueError(f"non-standard JSON constant: {value}")
+
+
+def _validate_screen_overrides(text):
+    """Check per-screen overrides JSON before it is written to kwinrc.
+
+    Mirrors the semantics of parseScreenConfig() in contents/code/main.js:
+    values main.js would silently ignore (or that fail JSON parsing) are
+    rejected here so the dialog never reports success for dead config.
+    Returns (True, "") when acceptable, else (False, reason).
+    """
+    if not text.strip():
+        return True, ""
+    try:
+        parsed = json.loads(text, parse_constant=_reject_constant)
+    except (ValueError, TypeError) as e:
+        return False, f"not valid JSON: {e}"
+    if not isinstance(parsed, dict):
+        return False, "must be a JSON object mapping output names to settings"
+    for output, cfg in parsed.items():
+        if not isinstance(cfg, dict):
+            return False, f'"{output}" must map to an object of settings'
+        for key, value in cfg.items():
+            if key not in _OVERRIDE_KEYS:
+                return False, f'"{output}" has unknown key "{key}"'
+            if isinstance(value, bool):
+                return False, f'"{output}.{key}" must be a number, not true/false'
+            if not isinstance(value, (int, float)) or not math.isfinite(value):
+                return False, f'"{output}.{key}" must be a finite number'
+            if key in ("width", "height", "widthRatio", "heightRatio"):
+                if value <= 0:
+                    return False, f'"{output}.{key}" must be positive'
+            elif key == "yOffset":
+                if value < 0:
+                    return False, f'"{output}.{key}" must not be negative'
+    return True, ""
+
 def _refresh_kwin_scripts(tray):
     return _dbus_call(tray, "/Scripting", "org.kde.kwin.Scripting", "start") is not None
 
@@ -260,6 +307,12 @@ class SettingsDialog(QDialog):
         self.recenter_on_show.setChecked(_read_option("recenterOnShow", "false") == "true")
 
     def _apply(self):
+        ok, reason = _validate_screen_overrides(self.screen_overrides.text())
+        if not ok:
+            err = f"Invalid per-screen overrides: {reason}"
+            print(f"kitty_tray: {err}", file=sys.stderr)
+            self.tray.showMessage("Kitty Dropdown", err, QSystemTrayIcon.MessageIcon.Warning, 8000)
+            return False
         writes = [
             ("widthRatio", None, str(self.width_ratio.value())),
             ("heightRatio", None, str(self.height_ratio.value())),
