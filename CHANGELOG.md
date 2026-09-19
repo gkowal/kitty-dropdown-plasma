@@ -5,6 +5,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+- Non-functional KRunner launch fallback: `App.query()` only fills the
+  runner UI and never launches anything, so a failed systemd `StartUnit`
+  request now surfaces via KWin's own D-Bus error log instead. Install
+  the autostart entry on non-systemd systems so Kitty is ready on toggle.
+
 ## [v1.7] - 2026-08-04
 
 ### Added

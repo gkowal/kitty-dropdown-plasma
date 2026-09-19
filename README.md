@@ -103,7 +103,7 @@ ln -sf "$(pwd)/kitty-autostart.desktop" ~/.config/autostart/
 This launches Kitty minimized at desktop login so it is ready when you press the shortcut.
 
 > [!NOTE]
-> For non-systemd environments where Kitty was not autostarted on login, the script will attempt a fallback launch using KRunner when the shortcut is pressed. Please note that this fallback method has not been tested by the author.
+> For non-systemd environments where Kitty was not autostarted on login, there is no automatic fallback launch; if the systemd request fails, KWin reports the D-Bus error in its own log. Install the autostart entry so Kitty is ready when the shortcut is pressed (pressing the shortcut again retries).
 
 **Note on Terminal Choice:** This project is built specifically for **Kitty** because it supports native **[Kittens (Python scripts)](https://sw.kovidgoyal.net/kitty/kittens/custom/)**. This allows us to handle complex window behaviors—like the "Smart EOF" logic—directly within the terminal's internal API, which is not possible with standard emulators.
 

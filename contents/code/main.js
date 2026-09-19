@@ -224,22 +224,21 @@ function launchKitty() {
 		"StartUnit",
 		"kitty-dropdown.service",
 		"replace",
-		function(res) {
-			if (!res) {
-				callDBus(
-					"org.kde.krunner",
-					"/App",
-					"org.kde.krunner.App",
-					"query",
-					"kitty --single-instance --instance-group dropdown --class kitty-dropdown --override hide_window_decorations=yes --hold --config ~/.config/kitty/kitty-dropdown.conf",
-					function(krunnerRes) {
-						if (!krunnerRes) {
-							print("launchKitty: both systemd and KRunner fallback failed to launch Kitty");
-							kittyLaunching = false;
-						}
-					}
-				);
-			}
+		function(job) {
+			// This callback runs only on a successful D-Bus reply:
+			// KWin does not invoke it on D-Bus errors (those surface
+			// in KWin's own log, not here), and a successful
+			// StartUnit reply carries systemd's job object path, so
+			// a falsy check here could never detect failure. `job`
+			// only confirms systemd accepted the request; the new
+			// window arrives via windowAdded -> setupKitty, which
+			// clears kittyLaunching. A failed launch leaves no
+			// window and the next toggle simply retries. Keep this
+			// callback attached: KWin only watches the D-Bus call
+			// (and reports errors in its log) when a callback is
+			// given; without it failures would be silent. There is
+			// deliberately no KRunner fallback: App.query() only
+			// fills the runner UI and never launches anything.
 		}
 	);
 }
