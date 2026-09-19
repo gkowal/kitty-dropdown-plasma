@@ -21,17 +21,39 @@ from PyQt6.QtWidgets import (
 
 KCFG_GROUP = "Script-org.kde.kitty-dropdown-plasma"
 KWN_SCRIPT_PLUGIN = "org.kde.kitty-dropdown-plasma"
-KWN_SCRIPT_PATH = os.path.join(
-    os.path.expanduser("~"),
-    ".local",
-    "share",
-    "kwin",
-    "scripts",
-    "org.kde.kitty-dropdown-plasma",
-    "contents",
-    "code",
-    "main.js",
-)
+
+
+def _user_script_path():
+    return os.path.join(
+        os.path.expanduser("~"),
+        ".local",
+        "share",
+        "kwin",
+        "scripts",
+        "org.kde.kitty-dropdown-plasma",
+        "contents",
+        "code",
+        "main.js",
+    )
+
+
+def _default_script_path():
+    # Prefer main.js shipped next to this file (works for git clones,
+    # KDE Store installs, and system-wide installs alike); fall back
+    # to the user-local KPackage path otherwise.
+    candidate = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "contents",
+        "code",
+        "main.js",
+    )
+    if os.path.isfile(candidate):
+        return candidate
+    return _user_script_path()
+
+
+KWN_SCRIPT_PATH = _default_script_path()
+
 
 def _shortcut_exists():
     msg = QDBusMessage.createMethodCall(

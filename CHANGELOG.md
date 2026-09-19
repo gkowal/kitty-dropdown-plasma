@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   request now surfaces via KWin's own D-Bus error log instead. Install
   the autostart entry on non-systemd systems so Kitty is ready on toggle.
 
+### Fixed
+- Tray Settings reload now loads `main.js` from the package containing
+  `kitty_tray.py` instead of a hardcoded user-local path, so it works
+  for system-wide installs too.
+
 ## [v1.7] - 2026-08-04
 
 ### Added
