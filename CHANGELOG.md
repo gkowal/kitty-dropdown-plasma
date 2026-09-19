@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `setup.sh --force/-f`: replaces an existing regular file with a symlink
+  after keeping a uniquely named timestamped backup.
+- `setup.sh` accepts unpacked release archives (e.g. ZIP downloads) as
+  source trees, detected by payload instead of `.git` presence.
+- Regression suites: shell tests for the installer (`tests/test_setup_*`),
+  node harnesses for the KWin geometry/launch logic (`tests/test_main_*`),
+  and mocked unit tests for the kitten and tray (`tests/test_dropdown_*`,
+  `tests/test_tray_*`).
+
 ### Removed
 - Non-functional KRunner launch fallback: `App.query()` only fills the
   runner UI and never launches anything, so a failed systemd `StartUnit`
@@ -14,6 +24,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the autostart entry on non-systemd systems so Kitty is ready on toggle.
 
 ### Fixed
+- Installer no longer silently replaces customized regular files; it
+  refuses by default and installs the new link before removing the old
+  launch method, so a refused switch leaves the previous setup intact.
+- `./setup.sh autostart`/`service` no longer abort when `systemctl` is
+  absent (the non-systemd audience); `daemon-reload` is skipped there.
+- `./setup.sh tray` refuses when the KWin scripts directory is missing
+  instead of installing an autostart entry pointing at nothing.
+- Smart EOF (`Ctrl+D`) never destroys the OS window, fails safe by
+  forwarding EOF on unknown foreground-process state, aborts on stale
+  window ids instead of acting on the active terminal, recognizes login
+  shells (`-zsh`), and bounds the D-Bus call with a timeout.
+- `yOffset` is clamped against the work area so oversized offsets cannot
+  push the dropdown off-screen.
+- With several matching dropdown windows, toggling prefers the one on
+  the active screen; missing-window toggles keep retrying instead of
+  risking a wedged launch guard.
+- Tray Settings dialog validates per-screen overrides JSON (finite whole
+  pixels, positive sizes/ratios, known keys) before saving.
 - Tray Settings reload now loads `main.js` from the package containing
   `kitty_tray.py` instead of a hardcoded user-local path, so it works
   for system-wide installs too.
@@ -21,6 +49,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   defaults/abort-with-warning instead of tracebacks, the unload wait
   pumps Qt events, the single-instance lock is per-user on `/tmp`, and
   a non-numeric `loadScript` reply fails gracefully.
+- README no longer overclaims launch-method switching, `--hold`
+  re-launch, or system-wide tray paths.
+- Packaging: dropped deprecated/empty desktop keys, the tray autostart
+  entry uses an explicit `python3` interpreter, and the service unit
+  documents its on-demand restart expectation.
 
 ## [v1.7] - 2026-08-04
 
