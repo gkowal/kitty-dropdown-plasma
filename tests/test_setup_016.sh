@@ -46,4 +46,35 @@ PATH="$STUB" HOME="$T" bash "$REPO/setup.sh" service >/dev/null 2>&1
 	&& echo "ok: foreign conflicting symlink left untouched" \
 	|| { echo "FAIL: foreign conflicting symlink removed"; fail=1; }
 
+# 4. A refused switch leaves the old method in place.
+rm -f "$AUTOSTART" "$SERVICE"
+ln -sf "$REPO/kitty-autostart.desktop" "$AUTOSTART"
+echo "hand installed service" > "$SERVICE"
+if PATH="$STUB" HOME="$T" bash "$REPO/setup.sh" service >/dev/null 2>&1; then
+	echo "FAIL: service unexpectedly succeeded over a regular file"; fail=1
+else
+	echo "ok: refused switch exits nonzero"
+fi
+[ -L "$AUTOSTART" ] \
+	&& echo "ok: old method link kept after refused switch" \
+	|| { echo "FAIL: old method link removed despite refusal"; fail=1; }
+[ "$(cat "$SERVICE")" = "hand installed service" ] \
+	&& echo "ok: blocking regular file untouched" \
+	|| { echo "FAIL: blocking regular file modified"; fail=1; }
+
+# 5. An mkdir/ln failure also keeps the old method (errexit is
+# suppressed inside link_file under `||`, so it guards manually).
+rm -f "$AUTOSTART" "$SERVICE"
+ln -sf "$REPO/kitty-autostart.desktop" "$AUTOSTART"
+rm -rf "$T/.config/systemd"
+echo "not a directory" > "$T/.config/systemd"
+if PATH="$STUB" HOME="$T" bash "$REPO/setup.sh" service >/dev/null 2>&1; then
+	echo "FAIL: service unexpectedly succeeded over a file-as-dir"; fail=1
+else
+	echo "ok: mkdir failure exits nonzero"
+fi
+[ -L "$AUTOSTART" ] \
+	&& echo "ok: old method link kept after mkdir failure" \
+	|| { echo "FAIL: old method link removed despite mkdir failure"; fail=1; }
+
 exit $fail

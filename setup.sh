@@ -73,8 +73,10 @@ link_file() {
 		echo "backed up $target to $backup"
 	fi
 	dir="$(dirname "$target")"
-	mkdir -p "$dir"
-	ln -sfn "$src" "$target"
+	# Explicit guards: link_file may run under `||` (errexit suppressed),
+	# so mkdir/ln failures must propagate manually, never echo success.
+	mkdir -p "$dir" || return 1
+	ln -sfn "$src" "$target" || return 1
 	echo "linked  $target"
 }
 
@@ -102,8 +104,10 @@ have_systemctl() {
 }
 
 do_service() {
+	# Install the new link first: if it fails (e.g. a regular file is
+	# in the way), the old launch method stays in place.
+	link_file "$script_dir/kitty-dropdown.service" "$SYSTEMD_DIR/kitty-dropdown.service" || return 1
 	unlink_linked "$AUTOSTART_DIR/kitty-autostart.desktop"
-	link_file "$script_dir/kitty-dropdown.service" "$SYSTEMD_DIR/kitty-dropdown.service"
 	if have_systemctl; then
 		systemctl --user daemon-reload
 	else
@@ -113,11 +117,13 @@ do_service() {
 }
 
 do_autostart() {
+	# Install the new link first: if it fails (e.g. a regular file is
+	# in the way), the old launch method stays in place.
+	link_file "$script_dir/kitty-autostart.desktop" "$AUTOSTART_DIR/kitty-autostart.desktop" || return 1
 	unlink_linked "$SYSTEMD_DIR/kitty-dropdown.service"
 	if have_systemctl; then
 		systemctl --user disable kitty-dropdown.service 2>/dev/null || true
 	fi
-	link_file "$script_dir/kitty-autostart.desktop" "$AUTOSTART_DIR/kitty-autostart.desktop"
 	if have_systemctl; then
 		systemctl --user daemon-reload
 	else
