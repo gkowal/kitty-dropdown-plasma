@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tray Settings reload now loads `main.js` from the package containing
   `kitty_tray.py` instead of a hardcoded user-local path, so it works
   for system-wide installs too.
+- Tray robustness: missing `kreadconfig6`/`kwriteconfig6` now degrade to
+  defaults/abort-with-warning instead of tracebacks, the unload wait
+  pumps Qt events, the single-instance lock is per-user on `/tmp`, and
+  a non-numeric `loadScript` reply fails gracefully.
 
 ## [v1.7] - 2026-08-04
 

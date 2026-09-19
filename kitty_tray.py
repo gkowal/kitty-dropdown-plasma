@@ -2,6 +2,7 @@
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -100,11 +101,30 @@ def toggle_kitty(tray):
         tray.showMessage("Kitty Dropdown", f"Failed to toggle: {err}", QSystemTrayIcon.MessageIcon.Warning, 5000)
 
 def _config_tool(tool, *args):
-    return subprocess.run(
-        [tool, "--file", "kwinrc", "--group", KCFG_GROUP, *args],
-        capture_output=True,
-        text=True,
-    )
+    # Missing tools must degrade to a failed result, never an unhandled
+    # traceback escaping a GUI slot: readers fall back to defaults and
+    # writers abort with a tray warning via the returncode checks.
+    if shutil.which(tool) is None:
+        return subprocess.CompletedProcess(
+            args=[tool, *args],
+            returncode=127,
+            stdout="",
+            stderr=f"{tool} not found; install the KDE Plasma 6 tools",
+        )
+    try:
+        return subprocess.run(
+            [tool, "--file", "kwinrc", "--group", KCFG_GROUP, *args],
+            capture_output=True,
+            text=True,
+        )
+    except OSError as e:
+        # Vanished/unexecutable between lookup and exec: same graceful path.
+        return subprocess.CompletedProcess(
+            args=[tool, *args],
+            returncode=127,
+            stdout="",
+            stderr=str(e),
+        )
 
 def _read_option(key, default):
     proc = _config_tool("kreadconfig6", "--key", key)
@@ -222,6 +242,8 @@ def _reload_kwin_script(tray):
             return False
         if not reply.arguments() or reply.arguments()[0] != True:
             break
+        # Keep the dialog responsive while waiting for the unload.
+        QApplication.processEvents()
         time.sleep(0.02)
     else:
         msg = "Timed out unloading the KWin script"
@@ -232,12 +254,15 @@ def _reload_kwin_script(tray):
     reply = _dbus_call(tray, "/Scripting", "org.kde.kwin.Scripting", "loadScript", [KWN_SCRIPT_PATH, KWN_SCRIPT_PLUGIN])
     if reply is None:
         return False
-    if not reply.arguments() or reply.arguments()[0] < 0:
+    args = reply.arguments()
+    # loadScript answers with a numeric script id (or a negative number
+    # on failure); anything else is a protocol surprise, not an id.
+    if not args or not isinstance(args[0], int) or args[0] < 0:
         msg = "Failed to load the KWin script"
         print(f"kitty_tray: {msg}", file=sys.stderr)
         tray.showMessage("Kitty Dropdown", msg, QSystemTrayIcon.MessageIcon.Warning, 5000)
         return False
-    script_id = reply.arguments()[0]
+    script_id = args[0]
 
     reply = _dbus_call(tray, f"/Scripting/Script{script_id}", "org.kde.kwin.Script", "run")
     if reply is None:
@@ -340,9 +365,21 @@ class SettingsDialog(QDialog):
         if self._apply():
             self.accept()
 
+def _tray_lock_path():
+    # XDG_RUNTIME_DIR is already per-user; only the /tmp fallback is
+    # shared, so qualify it with the uid to avoid blocking other users.
+    lock_dir = os.environ.get("XDG_RUNTIME_DIR")
+    if lock_dir:
+        return os.path.join(lock_dir, "kitty-dropdown-tray.lock")
+    try:
+        uid = os.getuid()
+    except AttributeError:
+        uid = 0
+    return os.path.join("/tmp", f"kitty-dropdown-tray-{uid}.lock")
+
+
 def main():
-    lock_dir = os.environ.get("XDG_RUNTIME_DIR") or "/tmp"
-    lock = QLockFile(os.path.join(lock_dir, "kitty-dropdown-tray.lock"))
+    lock = QLockFile(_tray_lock_path())
     if not lock.tryLock(100):
         print("kitty_tray: another instance is already running", file=sys.stderr)
         sys.exit(0)
