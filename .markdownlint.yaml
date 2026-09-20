@@ -1,0 +1,7 @@
+# Project markdown standards: prose docs carry unbreakable URLs and
+# shell commands, so line length is not enforced; Keep-a-Changelog
+# repeats Added/Fixed/Docs per release, so duplicate headings are
+# only an error between siblings.
+MD013: false
+MD024:
+  siblings_only: true

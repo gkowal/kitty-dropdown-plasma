@@ -17,7 +17,7 @@ Installing this script requires a few steps to register it within the KDE Plasma
 
 First, you need to download the script files to your local machine. You can do this by cloning the repository from GitHub:
 
-```
+```bash
 git clone https://github.com/gkowal/kitty-dropdown-plasma.git
 cd kitty-dropdown-plasma
 ```
@@ -28,7 +28,7 @@ Alternatively, download the ZIP archive from the repository and unpack it locall
 
 KDE Plasma uses the `kpackagetool6` utility to manage KWin scripts. Open a terminal inside the unpacked directory and run the following command to register the script with your system:
 
-```
+```bash
 kpackagetool6 --type KWin/Script --install .
 ```
 
@@ -47,7 +47,7 @@ Once installed, the script must be activated within your system settings.
 
 Download `kitty-dropdown-plasma-vX.Y.kwinscript` from the [KDE Store](https://store.kde.org/p/2348115) (use the latest version) and install it from **System Settings > Window Management > KWin Scripts** ("Install from File…"), or via:
 
-```
+```bash
 kpackagetool6 --type KWin/Script --install kitty-dropdown-plasma-vX.Y.kwinscript
 ```
 
@@ -95,6 +95,7 @@ systemctl --user daemon-reload
 > Because the unit file is symlinked, `git pull` updates it in place. After a pull, re-run `systemctl --user daemon-reload` (and restart the unit with `systemctl --user restart kitty-dropdown.service` if it is running) so systemd picks up the changes.
 
 **Why this is preferred:**
+
 - **Zero Resource Overhead at Boot:** Kitty is **not** launched at desktop startup, consuming 0 RAM and CPU.
 - **On-Demand Activation:** The first time you press the toggle shortcut (`Meta+F12`), the KWin script automatically starts the service via D-Bus.
 - **Self-Healing:** If Kitty crashes or is closed, pressing the shortcut automatically re-launches it on demand.
@@ -132,13 +133,16 @@ An optional system tray icon application (`kitty_tray.py`) is provided for users
 > The system tray autostart entry (`kitty-tray-autostart.desktop`) references the default KPackage install path (`~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/`). It will only work with user-level installs via `kpackagetool6`. If you have installed the script system-wide, you will need to edit the `Exec` line in the copied `.desktop` file to point to the correct location; the tray's Settings reload follows the tray script itself (provided the package's `contents/` ships alongside it), so no other path needs editing.
 
 #### Prerequisites
+
 `kitty_tray.py` requires **Python 3** and **PyQt6**:
+
 - **Fedora / RHEL**: `sudo dnf install python3-pyqt6`
 - **Arch Linux / Manjaro**: `sudo pacman -S python-pyqt6`
 - **Ubuntu / Debian**: `sudo apt install python3-pyqt6`
 - **openSUSE**: `sudo zypper install python3-PyQt6`
 
 #### Enabling the System Tray Icon
+
 To have the system tray icon start automatically upon desktop login, link the provided autostart desktop entry:
 
 ```bash
@@ -223,15 +227,20 @@ Look for lines starting with `Output: 1 eDP-1` or `Output: 2 HDMI-A-1`.
 
 The `screenOverrides` setting accepts a JSON object mapping monitor names to custom settings:
 
-* **Explicit Pixels on Laptop Screen (`eDP-1`):**
+- **Explicit Pixels on Laptop Screen (`eDP-1`):**
+
   ```json
   {"eDP-1": {"width": 1286, "height": 705}}
   ```
-* **Different Ratios for Laptop (`eDP-1`) and External Monitor (`HDMI-A-1`):**
+
+- **Different Ratios for Laptop (`eDP-1`) and External Monitor (`HDMI-A-1`):**
+
   ```json
   {"eDP-1": {"widthRatio": 0.80, "heightRatio": 0.70}, "HDMI-A-1": {"widthRatio": 0.72, "heightRatio": 0.78}}
   ```
-* **Mixing Explicit Pixels and Dynamic Ratios:**
+
+- **Mixing Explicit Pixels and Dynamic Ratios:**
+
   ```json
   {"eDP-1": {"width": 1286, "height": 705}, "HDMI-A-1": {"widthRatio": 0.75, "heightRatio": 0.80, "yOffset": 2}}
   ```
@@ -283,7 +292,9 @@ The flicker is purely cosmetic — window content and final position are unaffec
 To prevent the drop-down window from closing when the last tab receives an EOF (`Ctrl+D`), this project provides a Python kitten that manages window state natively.
 
 ### Installation
+
 1. Link `dropdown_manager.py` to your kitty configuration directory:
+
 ```bash
 ./setup.sh kitten
 ```
@@ -294,7 +305,8 @@ If you prefer not to use the script, link the file by hand:
 ln -sf "$(pwd)/dropdown_manager.py" ~/.config/kitty/
 ```
 
-2. Add the following mapping to your `kitty-dropdown.conf`:
+1. Add the following mapping to your `kitty-dropdown.conf`:
+
 ```conf
 map ctrl+d kitten dropdown_manager.py
 ```
@@ -303,14 +315,13 @@ map ctrl+d kitten dropdown_manager.py
 
 Unlike standard shell bindings, this script is process-aware:
 
-* **Local Shell:** If you are at a local prompt, `Ctrl+D` will **minimize** the window if it's the last tab, or **close** the tab if others are open.
-* **SSH & Apps:** If you are running `ssh`, `python`, `vim`, or other interactive tools, it sends a standard EOF signal, allowing the program to exit normally without minimizing your terminal.
+- **Local Shell:** If you are at a local prompt, `Ctrl+D` will **minimize** the window if it's the last tab, or **close** the tab if others are open.
+- **SSH & Apps:** If you are running `ssh`, `python`, `vim`, or other interactive tools, it sends a standard EOF signal, allowing the program to exit normally without minimizing your terminal.
 
 ---
 
 ## 5. Usage
 
-* **Toggle Terminal:** Press `Meta+F12` to slide the terminal in and out of view.
+- **Toggle Terminal:** Press `Meta+F12` to slide the terminal in and out of view.
 
-
-* **Rebind Shortcut:** Change the hotkey in **System Settings > Keyboard > Shortcuts > System Services > Window Management** under **"Toggle Kitty Drop-Down"**.
+- **Rebind Shortcut:** Change the hotkey in **System Settings > Keyboard > Shortcuts > System Services > Window Management** under **"Toggle Kitty Drop-Down"**.

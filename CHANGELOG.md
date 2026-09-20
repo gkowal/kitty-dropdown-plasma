@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - KDE Store artifact now bundles README.md, setup.sh, the kitten and
   tray helpers, and the service/autostart entries, with README
   instructions for wiring them up after a Store install.
@@ -15,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v1.8] - 2026-09-20
 
 ### Added
+
 - `setup.sh --force/-f`: replaces an existing regular file with a symlink
   after keeping a uniquely named timestamped backup.
 - `setup.sh` accepts unpacked release archives (e.g. ZIP downloads) as
@@ -25,12 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `tests/test_tray_*`).
 
 ### Removed
+
 - Non-functional KRunner launch fallback: `App.query()` only fills the
   runner UI and never launches anything, so a failed systemd `StartUnit`
   request now surfaces via KWin's own D-Bus error log instead. Install
   the autostart entry on non-systemd systems so Kitty is ready on toggle.
 
 ### Fixed
+
 - Installer no longer silently replaces customized regular files; it
   refuses by default and installs the new link before removing the old
   launch method, so a refused switch leaves the previous setup intact.
@@ -70,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v1.7] - 2026-08-04
 
 ### Added
+
 - **Tray Settings dialog**: adjust window ratios, per-screen JSON overrides, and
   re-center behavior. Apply/OK write `kwinrc`, refresh KWin's script config, and
   reload the script so geometry re-applies in place.
@@ -81,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Single-instance guard for the tray via `QLockFile`.
 
 ### Fixed
+
 - **Autostart**: replace the invalid `\$HOME` escape with `~`
   (`sh -c "exec ~/..."`); the systemd autostart generator rejected/mangled the old
   Exec line so the tray never started at login. Applies to both the tray and
@@ -97,9 +103,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   make kitty launch retry robust (incl. KRunner fallback with `~` expansion).
 
 ### Changed
+
 - Remove irrelevant terminal-emulator metadata from `kitty-autostart.desktop`.
 
 ### Docs
+
 - Document the systemd `[Install]` section and launch-method tradeoffs, and the
   one-frame flicker when toggling between monitors.
 - Ignore `__pycache__` in the repository.
@@ -107,53 +115,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v1.6] - 2026-08-01
 
 ### Added
+
 - Native GUI configuration (Plasma 6 config page) and multi-monitor scaling.
 
 ### Changed
+
 - Kitten: target a specific window ID and expand the shell whitelist.
 - Improve shell detection, `qdbus` fallback, and window matching.
 
 ### Docs
+
 - Correct animation-settings references in the README.
 
 ## [v1.5] - 2026-07-30
 
 ### Fixed
+
 - Preserve custom KWin Window Rules on startup and toggle.
 
 ## [v1.4] - 2026-07-30
 
 ### Added
+
 - Dynamic geometry positioning and a native borderless setup.
 
 ### Docs
+
 - Document toggle animations and desktop-effects customization.
 
 ## [v1.3] - 2026-07-28
 
 ### Added
+
 - Optional system tray icon applet (PyQt6.QtDBus).
 - Auto-launch Kitty on demand via a systemd D-Bus service.
 
 ### Docs
+
 - Add KDE Store badge and official Kitty references.
 
 ## [v1.2] - 2026-02-18
 
 ### Changed
+
 - Autodetect the `qdbus` command for the KDE minimize action.
 - Switch the KPlugin Id to reverse-DNS format.
 
 ## [v1.1] - 2026-02-14
 
 ### Added
+
 - Add `dropdown_manager.py` for native window management (Smart EOF).
 
 ### Docs
+
 - Update Smart EOF instructions.
 - Remove obsolete `kitty-dropdown.sh`.
 
 ## [v1.0] - 2026-02-04
 
 ### Added
+
 - Initial release: KWin script and configuration, autostart entry, README, metadata.
