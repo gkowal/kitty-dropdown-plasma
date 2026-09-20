@@ -60,13 +60,22 @@ function getOutputName(output) {
 
 function getScreenGeometry(screen) {
 	if (!screen) return null;
+	// Plasma 6 resolves per-screen work areas through the two-argument
+	// (options, Output) overload. Passing the virtual desktop as a third
+	// argument matches no overload, and KWin then answers with the union
+	// work area of all screens (observed: one 3863px area for a
+	// 1536+2328 layout), which centers the dropdown across a boundary.
 	try {
-		return workspace.clientArea(5, screen, workspace.currentDesktop);
+		return workspace.clientArea(5, screen);
 	} catch (e) {
 		try {
-			return workspace.clientArea(0, screen, workspace.currentDesktop);
+			return workspace.clientArea(0, screen);
 		} catch (e2) {
-			return screen.geometry;
+			try {
+				return screen.geometry;
+			} catch (e3) {
+				return null;
+			}
 		}
 	}
 }
@@ -83,15 +92,17 @@ function containsRect(outer, inner) {
 		&& outer.y + outer.height >= inner.y + inner.height;
 }
 
-function isMisplaced(client) {
+function isOnScreen(client, screen) {
 	let r = client.frameGeometry;
-	if (!r) return true;
-	let screens = workspace.screens;
-	for (let i = 0; i < screens.length; i++) {
-		let s = screens[i].geometry;
-		if (s && containsRect(s, r)) return false;
+	if (!r || !screen) return false;
+	let s = null;
+	try {
+		s = screen.geometry;
+	} catch (e) {
+		return false;
 	}
-	return true;
+	if (!s) return false;
+	return containsRect(s, r);
 }
 
 function toPositiveInt(value) {
@@ -232,7 +243,10 @@ function show(client) {
 	let targetScreen = workspace.activeScreen;
 	let area = targetScreen ? getScreenGeometry(targetScreen) : null;
 	let recenterOnShow = readConfig("recenterOnShow", false);
-	if (area && (recenterOnShow || !areasEqual(lastScreenArea, area) || isMisplaced(client))) {
+	// Refit unless the window already sits fully on the active screen:
+	// that also repairs windows left straddling a boundary or fully on
+	// another screen, which a bare area comparison can miss.
+	if (area && (recenterOnShow || !areasEqual(lastScreenArea, area) || !isOnScreen(client, targetScreen))) {
 		applyGeometry(client, targetScreen);
 	}
 	client.minimized = false;
