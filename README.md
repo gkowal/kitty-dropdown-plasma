@@ -43,6 +43,23 @@ Once installed, the script must be activated within your system settings.
 3. Locate **Kitty Drop-Down Plasma** in the list and check the box to enable it.
 4. Click **Apply**.
 
+### Installing from the KDE Store (.kwinscript)
+
+Download `kitty-dropdown-plasma-vX.Y.kwinscript` from the [KDE Store](https://store.kde.org/p/2348115) (use the latest version) and install it from **System Settings > Window Management > KWin Scripts** ("Install from File…"), or via:
+
+```
+kpackagetool6 --type KWin/Script --install kitty-dropdown-plasma-vX.Y.kwinscript
+```
+
+Then enable the script (Step 3 above) and wire up the companion components from the installed package — it ships `setup.sh` plus the kitten, tray, service, and autostart files:
+
+```bash
+cd ~/.local/share/kwin/scripts/org.kde.kitty-dropdown-plasma/
+./setup.sh kitten service tray
+```
+
+Choose `service` **or** `autostart`, not both. The script detects its installed location and links everything into place.
+
 ---
 
 ## 2. Configuration & Integration

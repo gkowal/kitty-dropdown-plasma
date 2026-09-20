@@ -6,7 +6,15 @@
 #   - the full contents/ tree
 #   - metadata.json
 #   - LICENSE
-# In particular this excludes: tests/, __pycache__/, .git/, *.sh, docs.
+#   - README.md
+#   - setup.sh
+#   - dropdown_manager.py
+#   - kitty_tray.py
+#   - kitty-autostart.desktop
+#   - kitty-tray-autostart.desktop
+#   - kitty-dropdown.service
+# In particular this excludes: tests/, __pycache__/, .git/,
+# package-kwinscript.sh itself, docs other than README.md.
 #
 # VERSION is read from metadata.json (KPlugin.Version).
 set -euo pipefail
@@ -25,7 +33,7 @@ if [ -z "${VERSION:-}" ]; then
 fi
 
 # Sanity-check the payload inputs.
-for f in contents metadata.json LICENSE; do
+for f in contents metadata.json LICENSE README.md setup.sh dropdown_manager.py kitty_tray.py kitty-autostart.desktop kitty-tray-autostart.desktop kitty-dropdown.service; do
     if [ ! -e "$f" ]; then
         echo "error: required payload '$f' not found in repo root" >&2
         exit 1
@@ -36,7 +44,7 @@ ARTIFACT="kitty-dropdown-plasma-v${VERSION}.kwinscript"
 rm -f "$ARTIFACT"
 
 if command -v zip >/dev/null 2>&1; then
-    zip -r "$ARTIFACT" contents metadata.json LICENSE
+    zip -r "$ARTIFACT" contents metadata.json LICENSE README.md setup.sh dropdown_manager.py kitty_tray.py kitty-autostart.desktop kitty-tray-autostart.desktop kitty-dropdown.service
 else
     if ! command -v python3 >/dev/null 2>&1; then
         echo "error: neither 'zip' nor 'python3' is available to build the archive" >&2
@@ -48,6 +56,13 @@ artifact = os.environ["ARTIFACT"]
 with zipfile.ZipFile(artifact, "w", zipfile.ZIP_DEFLATED) as z:
     z.write("metadata.json", "metadata.json")
     z.write("LICENSE", "LICENSE")
+    z.write("README.md", "README.md")
+    z.write("setup.sh", "setup.sh")
+    z.write("dropdown_manager.py", "dropdown_manager.py")
+    z.write("kitty_tray.py", "kitty_tray.py")
+    z.write("kitty-autostart.desktop", "kitty-autostart.desktop")
+    z.write("kitty-tray-autostart.desktop", "kitty-tray-autostart.desktop")
+    z.write("kitty-dropdown.service", "kitty-dropdown.service")
     for root, dirs, files in os.walk("contents"):
         for name in sorted(files):
             path = os.path.join(root, name)
